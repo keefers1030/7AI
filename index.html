@@ -1,0 +1,815 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>#142957: ‘Black Basta’ ransomware was prevented · 7AI</title>
+<link rel="icon" type="image/png" sizes="72x72" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAYAAABV7bNHAAACUElEQVR42u2Z4Y2CQBSE5wgFUIIlWALXgR2cxgLuqACtAK8AoyVgB5RACZRACfdDyJHNSnbfojzu5kuMkbgIw9vZ2SdACCGEEEIIIYQQQv4Tb+fzmSqMEFGCceLufQtgpeB6SgC1cewQcL4rgGbwOe1ezuN7gT48Bz6DBsDJIk4ecM7KIpDP+SpNUywD0A4+rwLF+VMeVHXTa8iFJn2nBbAzjm0UTHk1An0bPpEAKLjM/xqzuUp9KVlRVQhkTq21BmPWIlDZmfOQAsqYSyCbMW+1GLMGgY5G5kk0Vs9cAtWWxJx3Iqndi2WCC/SN7Y+MOe1WLtdAmc4hUC0YK0m6J8tvFZ5T87UC7ff70S886BcdBFml7W7QzDxrj+qpluBB0k1kZjHm3LN6FmHSkqlV4d6bMc/j6nvlHNUjEUiaVWzGvPGsPvXLvDSrHI3NqG8VXi3jVQpUCKJAA3uXcOUpsPqgmHbTSzK1WsPgP5dSPT4CSYz50WbUtQrbuasHAGKH/8Wkmcc01o2nMUsfzFOS9NSZZ4ouYaJhdx894QnWUN4lnEogaebJJqpC1QJJM8/VYswXLJhowsxjM2ZpFaoWSJp5FtMlDBVIuhk1E7PaLmGIQJLMYzPmNdy7hKqJA7YBPSeEdQn7aHBz/G4+l0AXyDajti5hKqjASqNA0WAbIM08pjH73kCFmZphrgIlAcZcThAPjlBMFLDa7CaIB6qrp/egm4dBDkNhY/Gjd4GH+eLzG7VD0h8dH0/4BBu8prlVLeAaCSGEEEIIIYQQQshC+QEEr4DLxqbA5wAAAABJRU5ErkJggg==">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* ===== 7AI design system tokens (accessibility refinements applied: text-secondary, danger-text) ===== */
+:root{
+  --bg-app:#f6f6fc; --surface:#fff; --surface-inset:#f9f9f9; --surface-nav:#21272d; --surface-nav-raised:#242a33;
+  --border:#e4e4e7; --rule-strong:#1d2127; --dot-grid:#c4c4c4;
+  --text-primary:#1d2127; --text-secondary:#6b6b6b; --text-on-nav:#fff; --text-on-nav-muted:#dbe0e8;
+  --accent:#6d5fc1; --accent-strong:#6c58d4; --accent-ink:#5b4eb0; --accent-soft:#eaeafc; --ai-bubble:#e7e4f3;
+  --danger:#fe504d; --danger-text:#c62d2a; --danger-soft:#f6ccc6; --warning:#ffa524; --in-progress:#fc9915;
+  --info-soft:#aecfde; --info-text:#1c3e4c; --success-soft:#cfdbd8; --success-text:#44554f; --neutral-chip:#d5d8d8; --code-chip:#edf0f3;
+  --entity-email:#3972ab; --entity-network:#60756c; --entity-alert:#d575c0; --entity-hash:#ccd5e1; --entity-source:#2786cf; --chart-elite:#576069;
+  --finding-bg:#d8edf5; --finding-num:#70c1e2; --finding-ink:#3f464d;
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-6:24px; --space-8:32px;
+  --radius-sm:4px; --radius-md:6px; --radius-lg:8px; --radius-full:999px;
+  --shadow-sm:0 1px 2px rgba(29,33,39,.08); --shadow-panel:0 8px 24px rgba(29,33,39,.16);
+  --font:Inter,-apple-system,system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+body{margin:0;background:var(--bg-app);color:var(--text-primary);font:400 13px/19px var(--font)}
+button{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.mono{font-family:var(--mono);font-size:12px}
+.muted{color:var(--text-secondary)}
+
+/* ===== header (matches the current 7AI product header) ===== */
+.chrome{position:sticky;top:0;z-index:50}
+.appbar{height:48px;background:var(--surface-nav);color:var(--text-on-nav);display:flex;align-items:center;gap:28px;padding:0 0 0 24px}
+.logo{display:flex;align-items:center;height:48px}
+.logo svg{height:22px;width:auto}
+.appbar nav{display:flex;gap:28px;align-self:stretch;overflow-x:auto}
+.appbar nav a{display:flex;align-items:center;color:var(--text-on-nav-muted);text-decoration:none;font-weight:500;font-size:13px;white-space:nowrap}
+.appbar nav a[aria-current=page]{color:var(--text-on-nav);font-weight:700}
+.appbar nav a:hover{color:#fff}
+.appbar .right{margin-left:auto;display:flex;align-items:center;align-self:stretch}
+.appbar .cfg{font-weight:700;font-size:13px;margin-right:20px;background:none;border:0;color:#fff;cursor:pointer}
+.iconbtn{position:relative;width:32px;height:32px;display:grid;place-items:center;background:none;border:0;border-radius:var(--radius-md);color:#fff;cursor:pointer}
+.iconbtn:hover{background:var(--surface-nav-raised)}
+.badge{position:absolute;top:-2px;right:-4px;min-width:16px;height:16px;border-radius:8px;background:var(--danger);color:var(--text-primary);font:700 9px/16px var(--font);text-align:center;padding:0 3px}
+.tenant{display:flex;align-items:center;gap:10px;height:100%;margin-left:12px;padding:0 20px;border-left:1px solid #3a424b;font-size:12px;font-weight:600;color:#fff;background:none;border-top:0;border-right:0;border-bottom:0;cursor:pointer}
+.avatar{width:32px;height:32px;border-radius:50%;background:#c9ced6;display:grid;place-items:center;color:#4c535c;font-weight:700;font-size:12px}
+.subhead{background:var(--bg-app);padding:16px 24px 0;border-bottom:1px solid var(--border)}
+.crumb{display:flex;align-items:center;gap:10px;font-size:12px;line-height:16px;margin-bottom:12px}
+.crumb a{color:var(--text-primary);text-decoration:none;display:flex;align-items:center;gap:6px}
+.crumb b{font-weight:600}
+.subrow{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.tabs{display:flex;gap:24px}
+.tab{display:block;padding:8px 2px 9px;font-size:12px;line-height:16px;color:var(--text-primary);text-decoration:none;border-bottom:2px solid transparent}
+.tab[aria-current=true]{font-weight:700;border-bottom-color:var(--text-primary)}
+.toolbar{display:flex;gap:8px;align-items:center;padding-bottom:8px;position:relative;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 12px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--surface);box-shadow:var(--shadow-sm);font:600 12px/16px var(--font);color:var(--text-primary);cursor:pointer;position:relative}
+.btn:hover{background:#fbfbfe}
+.btn.icon{width:32px;padding:0;justify-content:center}
+.review .btn,.dlgfoot .btn{border-radius:var(--radius-full);padding:0 18px}
+.btn.primary{background:var(--code-chip);border:1.5px solid #7f8fa3;color:#384c61;box-shadow:none;font-weight:700}
+.btn.primary:hover{background:#e3e8ef}
+.btn.secondary{background:var(--surface);border:1px solid var(--border);color:var(--text-primary)}
+.btn .play{color:var(--accent-strong)}
+.dot{position:absolute;top:-4px;left:-4px;width:10px;height:10px;border-radius:50%;background:var(--danger);border:2px solid var(--bg-app)}
+.statusdisc{width:12px;height:12px;border-radius:50%;border:2px solid var(--danger);background:linear-gradient(90deg,var(--danger) 50%,transparent 50%)}
+.menu{position:absolute;right:0;top:44px;min-width:200px;background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-panel);padding:6px;z-index:60}
+.menu button{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;background:none;border:0;border-radius:var(--radius-sm);text-align:left;cursor:pointer;font-weight:500}
+.menu button:hover{background:var(--bg-app)}
+
+/* ===== layout ===== */
+.page{max-width:1760px;margin:0 auto;padding:24px 32px 64px;display:flex;flex-direction:column;gap:24px}
+section[id]{scroll-margin-top:calc(var(--chrome-h,133px) + 24px)}
+.card{background:var(--surface);border-radius:var(--radius-lg);padding:24px}
+.cardtitle{font-size:16px;line-height:20px;font-weight:600;margin:0}
+.pagetitle{font-size:22px;line-height:28px;font-weight:300;margin:0}
+.rule{height:1px;background:linear-gradient(90deg,#c4c4c4,#6d5fc1);margin-top:8px}
+.caption{font-size:12px;line-height:16px;color:var(--text-secondary)}
+.label{font-size:12px;line-height:16px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--text-secondary)}
+.row{display:flex;gap:24px;flex-wrap:wrap;align-items:stretch}
+.grow{flex:1 1 520px;min-width:0}
+.pill{display:inline-flex;align-items:center;height:18px;padding:0 8px;border-radius:var(--radius-full);font:700 10px/14px var(--font);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.pill.mal{background:var(--danger);color:var(--text-primary)}
+.pill.esc{padding:0;color:var(--danger-text)}
+.pill.low{background:#1d2127;color:#fff}
+.pill.ok{background:var(--success-soft);color:var(--success-text);border-radius:var(--radius-sm)}
+.pill.neutral{background:var(--neutral-chip);color:var(--text-primary)}
+.pill.warn{background:var(--warning);color:var(--text-primary)}
+
+/* verdict zone */
+.verdict{display:flex;flex-direction:column;gap:24px}
+.vtop{display:flex;justify-content:space-between;align-items:center;gap:32px;flex-wrap:wrap}
+.vleft{display:flex;align-items:center;gap:24px;flex:1 1 640px;min-width:0}
+.halo{width:72px;height:72px;border-radius:50%;background:var(--danger-soft);display:grid;place-items:center;flex:none}
+.shield{width:56px;height:56px;border-radius:50%;background:var(--danger);display:grid;place-items:center;color:var(--text-primary)}
+.shield .i{width:28px;height:28px}
+.vtitle{font-size:20px;line-height:26px;font-weight:600;text-decoration:underline;text-underline-offset:3px;margin:8px 0}
+.stamps{display:flex;align-items:center;gap:24px}
+.stamp b{display:block;font-weight:400;font-size:13px;color:var(--text-primary)}
+hr{border:0;height:1px;background:var(--border);margin:0}
+.signals{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.sig{background:var(--surface-inset);border-radius:var(--radius-sm);padding:16px;display:flex;flex-direction:column;gap:4px}
+.sig .val{font-size:16px;line-height:20px;font-weight:600}
+.sig.verdictcard{outline:2px solid var(--danger);outline-offset:-2px}
+.chipmal{display:inline-block;background:var(--danger);color:var(--text-primary);padding:2px 8px;border-radius:var(--radius-sm)}
+.sig .reason-link{margin-top:auto;align-self:flex-end;padding-top:12px}
+.sig[data-sig]{cursor:pointer;transition:background .15s}
+.sig[data-sig]:hover{background:#f2f2f6}
+.sig.active{box-shadow:0 0 0 3px var(--accent)}
+.sparkle{width:14px;height:14px;color:var(--text-primary);vertical-align:-2px;margin-left:6px}
+.reasoning{background:var(--surface-inset);border-radius:var(--radius-sm);padding:16px 16px 16px 24px;display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.reasoning p{margin:0 0 8px}
+.reasoning ul{margin:0 0 8px;padding-left:18px}
+.reasoning li{margin-bottom:4px}
+.reasoning .acts{display:flex;gap:16px;flex-wrap:wrap;margin-top:4px}
+.flash{animation:flash 1.6s ease-out}
+@keyframes flash{0%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:0 0 0 3px transparent}}
+
+/* generic accordion pieces */
+.acc-btn{width:100%;display:flex;align-items:center;gap:12px;text-align:left;background:none;border:0;padding:0;cursor:pointer}
+.chev{transition:transform .15s}
+[aria-expanded=true]>.chev,[aria-expanded=true] .chev{transform:rotate(90deg)}
+[hidden]{display:none!important}
+.claim{color:var(--accent);text-decoration:underline;cursor:pointer;background:none;border:0;padding:0;font:inherit}
+.inset{background:var(--surface-inset);border-radius:var(--radius-sm);padding:16px}
+.kv{display:grid;grid-template-columns:128px minmax(0,1fr);gap:0 12px}
+.kv>*{padding:8px 0;border-bottom:1px solid var(--border)}
+.kv>dt{color:var(--text-secondary);font-size:12px;line-height:19px;margin:0}
+.kv>dd{margin:0}
+.review{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.linkbtn{background:none;border:0;padding:0;color:var(--accent);font:inherit;font-size:12px;cursor:pointer;text-decoration:none}
+.linkbtn:hover{text-decoration:underline}
+.sentinel-logo{display:block;height:40px;width:auto}
+.vendor{width:32px;height:32px;border-radius:var(--radius-sm);background:var(--entity-source);display:grid;place-items:center;color:#fff}
+
+/* report */
+.cols{display:grid;grid-template-columns:minmax(0,1fr) 520px;gap:24px;align-items:stretch}
+.rgrid{display:grid;grid-template-columns:minmax(0,1fr) 520px;gap:24px;align-items:stretch}
+.rgrid.noaside{grid-template-columns:minmax(0,1fr)}
+.rgrid.noaside aside{display:none}
+.rcol{display:flex;flex-direction:column;gap:24px;min-width:0}
+.rcol>.card:last-child,.acol>.card:last-child{flex:1}
+.acol{display:flex;flex-direction:column;gap:24px;min-width:0}
+.steps{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.step{border:1px solid var(--border);border-radius:var(--radius-md)}
+.step-head{padding:16px}
+.node32{width:32px;height:32px;border-radius:50%;border:1px dashed var(--text-secondary);display:grid;place-items:center;flex:none}
+.step-sum{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:4px}
+.step-body{padding:0 16px 8px}
+.rail-row{display:grid;grid-template-columns:32px minmax(0,1fr);gap:16px}
+.rail{border-right:1px dashed var(--text-secondary);display:flex;justify-content:center;align-items:flex-start;padding-top:2px}
+.rail span{writing-mode:vertical-rl;transform:rotate(180deg);font:700 10px/12px var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--text-secondary);white-space:nowrap}
+.rail-content{padding-bottom:16px;min-width:0}
+.input-card{background:var(--surface-inset);border-radius:var(--radius-sm);padding:12px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.tool{border-top:1px solid var(--rule-strong)}
+.tool-btn{padding:12px 0}
+.tool-btn .run{flex:1;min-width:0}
+.tool-detail{padding:4px 0 16px 28px}
+.tool-detail .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:12px}
+pre.code{margin:4px 0 0;background:var(--surface-inset);border-radius:var(--radius-sm);padding:12px;font:400 11px/16px var(--mono);white-space:pre-wrap;word-break:break-word}
+.outcome{display:inline-flex;align-items:center;gap:6px;font-size:12px}
+.hl{background:#fff4d6;transition:background 1.2s}
+.finding{background:var(--finding-bg);border-radius:var(--radius-sm)}
+.finding .acc-btn{padding:12px;align-items:center}
+.mk{width:26px;height:26px;border-radius:50%;background:var(--finding-num);color:var(--info-text);display:grid;place-items:center;flex:none;transition:background .2s,color .2s}
+.mk .i{width:14px;height:14px}
+.mk .ck{display:none}
+.finding.reviewed .mk{background:var(--success-text);color:#fff}
+.finding.reviewed .mk .ic{display:none}
+.finding.reviewed .mk .ck{display:block}
+.finding-body{padding:0 12px 12px 46px;color:var(--text-primary)}
+.finding .cap{color:var(--finding-ink);font-size:12px;line-height:16px}
+.finding .linkbtn{color:var(--accent-ink);font-weight:500}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--text-secondary);text-align:left;padding:8px 12px 8px 0;border-bottom:1px solid var(--rule-strong)}
+td{padding:10px 12px 10px 0;border-bottom:1px solid var(--border);vertical-align:top}
+.legend{display:flex;gap:10px 16px;flex-wrap:wrap;margin-top:10px}
+.cov{list-style:none;margin:0;padding:0}
+.cov-row{padding:8px 0;border-bottom:1px solid var(--border)}
+.cov-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.cov-name{font-weight:500}
+.cov-sub{font-size:12px;line-height:16px;color:var(--text-secondary);margin-top:2px}
+.cov-sub .mono{font-size:11px}
+.outcomes{margin-top:12px}
+.outcomes summary{cursor:pointer;color:var(--accent);font-size:12px;list-style:none}
+.outcomes summary::-webkit-details-marker{display:none}
+.outcomes summary::before{content:"›";display:inline-block;width:14px;transition:transform .15s}
+.outcomes[open] summary::before{transform:rotate(90deg)}
+
+/* audit */
+.timeline{display:flex;flex-direction:column}
+.ev{position:relative;border-left:1px dashed var(--text-secondary);margin-left:6px;padding:0 0 24px 20px}
+.ev:last-child{border-left-color:transparent;padding-bottom:0}
+.ev::before{content:"";position:absolute;left:-7px;top:3px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:1px solid var(--text-secondary)}
+.ev.key::before{background:var(--text-primary);border-color:var(--text-primary)}
+.ev.you::before{background:var(--accent);border-color:var(--accent)}
+.ev b{font-weight:600}
+.field{width:100%;min-height:40px;border:1px solid var(--text-secondary);border-radius:var(--radius-md);background:var(--surface);padding:10px 12px;font:400 13px/19px var(--font);color:var(--text-primary)}
+textarea.field{min-height:88px;resize:vertical}
+
+/* entity map */
+.maphead{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:#fff}
+.seg button{border:0;background:#fff;padding:6px 14px;font:500 12px/16px var(--font);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--text-primary);color:#fff}
+.map{position:relative;height:460px;margin-top:16px;border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;background-color:#fff;background-image:radial-gradient(var(--dot-grid) 1px,transparent 1px);background-size:16px 16px;touch-action:none;cursor:grab}
+.map.big{height:680px}
+.map.dragging{cursor:grabbing}
+.stage{position:absolute;left:0;top:0;width:1000px;height:520px;transform-origin:0 0}
+.edges{position:absolute;left:0;top:0;width:1000px;height:520px;overflow:visible;pointer-events:none}
+.edges path{fill:none;stroke:var(--text-secondary);stroke-width:1.2;stroke-dasharray:1.5 3.5;stroke-linecap:round}
+.node{position:absolute;width:170px;transform:translate(-50%,-26px);display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;padding:0;cursor:pointer}
+.nhalo{width:52px;height:52px;border-radius:50%;display:grid;place-items:center}
+.node.mal .nhalo{background:var(--danger-soft)}
+.ndisc{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:#fff}
+.node.mal .ndisc{border:2px solid var(--danger)}
+.node[aria-pressed=true] .ndisc{box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--accent)}
+.ntype{font-size:10px;line-height:12px;color:var(--text-secondary)}
+.nval{font-size:11px;line-height:14px;font-weight:600;background:var(--code-chip);padding:2px 8px;border-radius:var(--radius-full);max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.node.mal .nval{background:var(--danger);color:var(--text-primary)}
+.mapctl{position:absolute;right:16px;bottom:16px;display:flex;flex-direction:column;gap:6px;cursor:default}
+.mappanel{position:absolute;left:16px;top:16px;bottom:16px;width:300px;background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-panel);padding:16px;overflow:auto;cursor:default}
+.mapwrap{position:relative}
+
+/* dialogs and toasts */
+dialog{border:0;border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-panel);width:min(520px,calc(100vw - 32px));color:var(--text-primary)}
+dialog::backdrop{background:rgba(29,33,39,.45)}
+dialog.drawer{position:fixed;inset:0 0 0 auto;margin:0;height:100vh;max-height:none;width:min(440px,100vw);border-radius:0;overflow:auto}
+dialog h2{margin:0 0 16px;font-size:16px;line-height:20px;font-weight:600}
+.dlgfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.err{color:var(--danger-text);font-size:12px;margin-top:6px}
+#toasts{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;z-index:200;pointer-events:none}
+.toast{background:var(--surface-nav);color:#fff;padding:10px 16px;border-radius:var(--radius-md);box-shadow:var(--shadow-panel);font-weight:500}
+
+@media (max-width:1180px){.rgrid,.cols{grid-template-columns:minmax(0,1fr)}.signals{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:700px){.page{padding:16px}.signals{grid-template-columns:1fr}.appbar nav{gap:16px}.tenant span{display:none}.mappanel{width:calc(100% - 32px);bottom:auto;max-height:70%}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-chevd" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></symbol>
+    <symbol id="i-laptop" viewBox="0 0 24 24"><path d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+    <symbol id="i-msg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6M10 22h4"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"/></symbol>
+    <symbol id="i-panel" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M15 3v18"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5M12 15V3"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" fill="currentColor" stroke="none"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-fit" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M3 12h3M18 12h3M12 3v3M12 18v3"/></symbol>
+  </defs>
+</svg>
+
+<div class="chrome">
+  <header class="appbar">
+    <a class="logo" href="#summary" aria-label="7AI home">
+      <svg viewBox="0 0 200 100" role="img" aria-label="7AI"><path fill="#fff" d="M3.55,0h95.15l-61.14,100H0L42.26,32.28H3.55V0ZM154.61,0v100h-31.02v-13.85h-28.98l-7.28,13.85h-35.61L112.81,0h41.81ZM123.6,61.4v-30.43l-15.98,30.43h15.98ZM167.21,100h32.79V0h-32.79v100Z"/></svg>
+    </a>
+    <nav aria-label="Primary">
+      <a href="#" data-stub>Dashboard</a><a href="#summary" aria-current="page">Services</a><a href="#" data-stub>Threat Intelligence</a><a href="#" data-stub>Agents</a><a href="#" data-stub>Connectors</a><a href="#" data-stub>Enterprise Insights</a>
+    </nav>
+    <div class="right">
+      <button class="cfg" data-stub>Configuration</button>
+      <button class="iconbtn" data-stub aria-label="Notifications, 11 unread"><svg class="i"><use href="#i-bell"/></svg><span class="badge" aria-hidden="true">11</span></button>
+      <button class="iconbtn" data-stub aria-label="Settings"><svg class="i"><use href="#i-gear"/></svg></button>
+      <button class="tenant" data-stub aria-label="Account menu, Dennis Nedry"><span class="avatar" aria-hidden="true">DN</span><span>Dennis Nedry</span><svg class="i" style="width:12px;height:12px"><use href="#i-chevd"/></svg></button>
+    </div>
+  </header>
+  <div class="subhead">
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="#" data-stub>Investigate</a><svg class="i" style="width:12px;height:12px;color:var(--text-secondary)"><use href="#i-chev"/></svg>
+      <a href="#" data-stub><svg class="i" style="width:14px;height:14px"><use href="#i-shield"/></svg>All Investigations</a><svg class="i" style="width:12px;height:12px;color:var(--text-secondary)"><use href="#i-chev"/></svg>
+      <b aria-current="page">#142957: ‘Black Basta’ ransomware was prevented</b>
+    </nav>
+    <div class="subrow">
+      <nav class="tabs" aria-label="Investigation sections">
+        <a class="tab" href="#summary" aria-current="true">Summary</a>
+        <a class="tab" href="#report">Report</a>
+        <a class="tab" href="#remediation">Remediation</a>
+        <a class="tab" href="#artifacts">Artifacts</a>
+      </nav>
+      <div class="toolbar" role="toolbar" aria-label="Investigation actions">
+        <button class="btn" id="btnHistory"><span class="dot" id="histDot" hidden></span><svg class="i"><use href="#i-list"/></svg>Investigation History</button>
+        <button class="btn" id="btnFeedback"><svg class="i"><use href="#i-msg"/></svg>Add Feedback</button>
+        <button class="btn" id="btnInsight"><svg class="i"><use href="#i-bulb"/></svg>Add Alert Insight</button>
+        <button class="btn" id="btnReplay" aria-pressed="false"><svg class="i play" id="replayIcon"><use href="#i-play"/></svg><span id="replayLabel">Replay</span></button>
+        <button class="btn" id="btnStatus"><span class="statusdisc" aria-hidden="true"></span><span id="statusLabel">Escalated</span></button>
+        <button class="btn icon" id="btnPanel" aria-label="Hide side panel" aria-pressed="false" title="Show or hide the findings side panel"><svg class="i"><use href="#i-panel"/></svg></button>
+        <button class="btn icon" id="btnMore" aria-label="More actions" aria-haspopup="menu" aria-expanded="false"><svg class="i"><use href="#i-more"/></svg></button>
+        <div class="menu" id="moreMenu" role="menu" hidden>
+          <button role="menuitem" id="miDownload"><svg class="i"><use href="#i-download"/></svg>Download Report</button>
+          <button role="menuitem" id="miCopy"><svg class="i"><use href="#i-link"/></svg>Copy Link</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="page">
+
+<!-- ================= SUMMARY ================= -->
+<section id="summary" aria-label="Summary" style="display:flex;flex-direction:column;gap:24px">
+  <div class="card verdict" id="verdictZone">
+    <div class="vtop">
+      <div class="vleft">
+        <div class="halo"><div class="shield"><svg class="i"><use href="#i-shield"/></svg></div></div>
+        <div style="min-width:0">
+          <div class="caption">Microsoft Sentinel alert for ransomware was prevented:</div>
+          <h1 class="vtitle">‘Black Basta’ ransomware was prevented on JACKSON-LAPTOP-7334</h1>
+          <div style="display:flex;gap:12px;align-items:center"><span class="pill esc">Escalated</span><span class="pill mal">Malicious</span><span class="pill ok" id="reviewPill" hidden></span></div>
+        </div>
+      </div>
+      <div class="stamps">
+        <div class="stamp"><span class="caption">7AI received alert at</span><b>Dec 2, 2024 at 11:06:31 AM</b></div>
+        <span class="caption">38 sec →</span>
+        <div class="stamp"><span class="caption">7AI reached a conclusion at</span><b>Dec 2, 2024 at 11:07:09 AM</b></div>
+      </div>
+    </div>
+    <hr>
+    <div class="signals">
+      <div class="sig" data-sig="severity"><span class="label">Source severity</span><span class="val">Low</span><span class="caption">Rated by Microsoft Sentinel</span><button class="linkbtn reason-link" data-reason="severity" aria-expanded="false" aria-controls="reasoning">View reasoning ›</button></div>
+      <div class="sig verdictcard" data-sig="verdict"><span class="label">7AI verdict<svg class="i sparkle" aria-hidden="true"><use href="#i-sparkle"/></svg></span><span class="val" style="color:var(--danger-text)">Malicious</span><span class="caption">True positive</span><button class="linkbtn reason-link" data-reason="verdict" aria-expanded="false" aria-controls="reasoning">View reasoning ›</button></div>
+      <div class="sig" data-sig="scope"><span class="label">Observed scope</span><span class="val">1 device · 1 process</span><span class="caption">Minimal blast radius</span><span class="caption">User and device investigated</span><button class="linkbtn reason-link" data-reason="scope" aria-expanded="false" aria-controls="reasoning">View reasoning ›</button></div>
+      <div class="sig" id="sigWorkflow" data-sig="workflow"><span class="label">Workflow status</span><span class="val">Escalated</span><span class="caption">Investigation: complete</span><span class="caption">Response: not documented in this report</span><span class="caption" id="sigReview">Analyst review: pending</span><button class="linkbtn reason-link" data-reason="workflow" aria-expanded="false" aria-controls="reasoning">View reasoning ›</button></div>
+    </div>
+    <div class="reasoning" id="reasoning" role="region" aria-live="polite" aria-label="Reasoning" hidden></div>
+  </div>
+
+
+  <div class="cols">
+    <div class="card" style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      <h2 class="cardtitle">7AI Conclusion<svg class="i sparkle" style="width:16px;height:16px" aria-hidden="true"><use href="#i-sparkle"/></svg></h2>
+      <p style="margin:0">The investigation of the “Black Basta ransomware prevented” alert confirmed the activity was malicious but had minimal blast radius. The user <span class="mono">jackson.miller</span> and the device <span class="mono">JACKSON-LAPTOP-7334</span> were investigated, revealing <button class="claim" data-finding="2">one malicious file</button> and <button class="claim" data-finding="3">one malicious domain</button> (<span class="mono">moereng.com</span>). The alert was determined to be a <button class="claim" data-finding="1">true positive</button>, but the infection was <button class="claim" data-finding="4">limited to one process execution on one device</button>.</p>
+      <div class="caption">Underlined claims open the finding that supports them.</div>
+      <div class="inset">
+        <button class="acc-btn" aria-expanded="true" aria-controls="pvo"><svg class="i chev"><use href="#i-chev"/></svg><span class="label">Prevented vs. observed</span></button>
+        <dl class="kv" id="pvo" style="margin:8px 0 0">
+          <dt>Source says</dt><dd>Ransomware was prevented (Microsoft Sentinel)</dd>
+          <dt>Observed</dt><dd>One process execution on one device; one malicious file; one malicious domain (<span class="mono">moereng.com</span>)</dd>
+          <dt>Response actions</dt><dd>None documented in this report</dd>
+        </dl>
+      </div>
+      <div class="review">
+        <button class="btn primary" data-act="confirm">Confirm verdict</button>
+        <button class="btn secondary" data-act="challenge">Challenge verdict…</button>
+        <a class="linkbtn" href="#findingsCard" data-reviewlink>Findings reviewed: <span data-reviewed>0</span> of 4</a>
+      </div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      <h2 class="cardtitle">Original Alert</h2>
+      <dl class="kv" style="margin:0">
+        <dt>Alert Source</dt><dd>Microsoft Sentinel</dd>
+        <dt>Alert Received</dt><dd>Dec 2, 2024 at 11:06:31 AM</dd>
+        <dt>Type</dt><dd>ransomware was prevented</dd>
+        <dt>Device</dt><dd class="mono">JACKSON-LAPTOP-7334</dd>
+        <dt>User</dt><dd class="mono">jackson.miller</dd>
+        <dt>Alert Severity</dt><dd><span class="pill low">Low</span></dd>
+      </dl>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button class="btn" id="btnAlertDetails">Alert details</button>
+        <button class="btn" id="btnViewOriginal">View original alert</button>
+        <img class="sentinel-logo" src="data:image/png;base64,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" width="95" height="40" alt="Microsoft Sentinel">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REPORT ================= -->
+<section id="report" aria-label="Report">
+  <div class="rgrid" id="rgrid">
+    <div class="rcol">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap">
+          <div><h2 class="pagetitle">Agentic Investigation Report</h2><div class="caption" style="margin-top:4px">Step-by-step investigation findings and agent analysis</div></div>
+          <div style="display:flex;gap:8px"><button class="btn" id="btnExpandAll">Expand all</button><button class="btn" id="btnCollapseAll">Collapse all</button></div>
+        </div>
+        <div class="rule"></div>
+        <div class="steps" id="steps"></div>
+      </div>
+    </div>
+    <aside class="acol" id="findingsCard" aria-label="Findings, sources and coverage">
+      <div class="card">
+        <h2 class="cardtitle">Findings &amp; evidence</h2>
+        <div class="caption" style="margin:4px 0 16px">Each finding points to the tool result behind it. Reviewed: <span data-reviewed>0</span> of 4</div>
+        <div id="findings" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+      <div class="card" id="sourcesCard">
+        <h2 class="cardtitle">Sources &amp; coverage</h2>
+        <div class="caption" style="margin:4px 0 8px">What the agents checked, and whether each query returned data. Investigated: user <span class="mono">jackson.miller</span> and device <span class="mono">JACKSON-LAPTOP-7334</span>.</div>
+        <ul class="cov" id="coverageList"></ul>
+        <details class="outcomes">
+          <summary>How to read this</summary>
+          <div class="legend caption">
+            <span><span class="pill ok">Returned data</span> the query ran and returned results</span>
+            <span><span class="pill neutral">No matches</span> the query ran and found nothing</span>
+            <span><span class="pill warn">Unavailable</span> the source could not be queried</span>
+            <span><span class="pill neutral" style="background:transparent;border:1px solid var(--text-secondary)">Not stated</span> the report does not say</span>
+          </div>
+          <p class="caption" style="margin:12px 0 0">Connector health is managed under Connectors in the main navigation. It shows whether a source is connected now, not whether a past query succeeded.</p>
+        </details>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ================= REMEDIATION ================= -->
+<section id="remediation" aria-label="Remediation">
+  <div class="cols">
+    <div class="card" style="display:flex;flex-direction:column;gap:24px;min-width:0">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <h2 class="pagetitle">Audit &amp; review</h2>
+        <button class="linkbtn" id="linkAudit">View audit log ›</button>
+      </div>
+      <div class="inset"><span class="label">Response actions documented</span><div style="margin-top:4px">None in this report. Containment or cleanup steps would appear here with their status.</div></div>
+      <div class="timeline" id="timelineInline" aria-label="Audit timeline"></div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;gap:12px;align-self:start">
+      <h2 class="cardtitle">Analyst review</h2>
+      <div id="reviewStatus"><b>Pending.</b> No analyst has confirmed or challenged this verdict yet.</div>
+      <div class="caption">Findings reviewed: <span data-reviewed>0</span> of 4</div>
+      <button class="linkbtn" id="goVerdict" style="text-align:left">Go to the verdict controls ›</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ARTIFACTS ================= -->
+<section id="artifacts" aria-label="Artifacts">
+  <div class="card">
+    <div class="maphead">
+      <div><h2 class="pagetitle">Artifact discovery</h2><div class="caption" style="margin-top:4px">Explore investigation elements and their details. Select an element to see how it connects.</div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn" id="btnMapSize"><svg class="i"><use href="#i-expand"/></svg><span>Enlarge map</span></button>
+        <div class="seg" role="group" aria-label="View"><button id="vGraph" aria-pressed="true">Graph</button><button id="vTable" aria-pressed="false">Table</button></div>
+      </div>
+    </div>
+    <div class="mapwrap" id="graphView">
+      <div class="map" id="map" aria-label="Entity graph. Use Tab to move between entities and Enter to select one.">
+        <div class="stage" id="stage"><svg class="edges" id="edges" aria-hidden="true"></svg></div>
+        <div class="mappanel" id="mapPanel" hidden></div>
+        <div class="mapctl"><button class="btn icon" id="zIn" aria-label="Zoom in"><svg class="i"><use href="#i-plus"/></svg></button><button class="btn icon" id="zOut" aria-label="Zoom out"><svg class="i"><use href="#i-minus"/></svg></button><button class="btn icon" id="zFit" aria-label="Reset view"><svg class="i"><use href="#i-fit"/></svg></button></div>
+      </div>
+    </div>
+    <div id="tableView" hidden style="margin-top:16px;overflow-x:auto"><table><thead><tr><th scope="col">Type</th><th scope="col">Value</th><th scope="col">Verdict</th><th scope="col">Relationship</th></tr></thead><tbody id="entityRows"></tbody></table></div>
+  </div>
+</section>
+
+</main>
+
+<!-- dialogs -->
+<dialog id="dlg" aria-labelledby="dlgTitle"><form method="dialog" id="dlgForm"><h2 id="dlgTitle"></h2><div id="dlgBody"></div><div class="dlgfoot"><button class="btn secondary" value="cancel" id="dlgCancel" type="button">Cancel</button><button class="btn primary" id="dlgOk" type="submit"></button></div></form></dialog>
+<dialog id="drawer" class="drawer" aria-labelledby="drawerTitle"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px"><h2 id="drawerTitle" style="margin:0">Investigation History</h2><button class="btn icon" id="drawerClose" aria-label="Close history"><svg class="i"><use href="#i-x"/></svg></button></div><div class="timeline" id="timelineDrawer"></div></dialog>
+<div id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, r=document) => r.querySelector(s), $$ = (s, r=document) => [...r.querySelectorAll(s)];
+const icon = (n, cls='') => `<svg class="i ${cls}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const nowTime = () => new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+
+/* ---------- data: content comes from the investigation report; the one response sample is marked illustrative ---------- */
+const STEPS = [
+  { id:'edr', icon:'shield', title:'EDR Enrichment Agent investigated', agent:'EDR Enrichment Agent',
+    input:{ label:'MS Sentinel Alert', value:'‘Black Basta’ ransomware was prevented', pill:true, note:'Threat Intelligence report was used in this investigation step' },
+    tools:[
+      { id:'t-domain', name:'FlowDomainMaliciousCheck', result:'Malicious', outcome:'data', input:'moereng.com', response:'{\n  "domain": "moereng.com",\n  "reputation": "malicious"\n}', text:'The domain has a malicious reputation.', evidence:'Domain reputation' },
+      { id:'t-ip', name:'FlowIPAddressMaliciousCheck', result:null, outcome:'notstated', input:'IP address from the alert (value not recorded)', text:'The report summary does not state a result for this check.', evidence:'IP address reputation' },
+      { id:'t-hash', name:'FlowSHA256HashMaliciousCheck', result:'Malicious', outcome:'data', input:'SHA-256 of the executed file (value not recorded)', text:'The file has a malicious reputation.', evidence:'File reputation' }
+    ],
+    teaser:'The domain and the file have malicious reputations',
+    conclusion:'The alert involves an external domain name, a device, and a file executed on that device. The domain and the file have malicious reputations. Affected user: jackson.miller, device: JACKSON-LAPTOP-7334.' },
+  { id:'device', icon:'laptop', title:'Device Agent investigated', agent:'Device Agent',
+    input:{ label:'Hostname', value:'JACKSON-LAPTOP-7334' },
+    tools:[
+      { id:'t-conn', name:'FlowDeviceDomainConnections', result:null, outcome:'data', input:'JACKSON-LAPTOP-7334', text:'One network connection to the malicious domain was found.', evidence:'Network connections from the device' },
+      { id:'t-logon', name:'FlowUsersLoggedIntoDevice', result:null, outcome:'data', input:'JACKSON-LAPTOP-7334', text:'Jackson Miller was the only user seen logging into the device around the time of the alert.', evidence:'Users logged into the device' }
+    ],
+    teaser:'One connection to the malicious domain; only Jackson Miller logged in',
+    conclusion:'Logon and network activity was identified on JACKSON-LAPTOP-7334. The primary user, Jackson Miller, was the only user seen logging into the device around the time of the alert. One network connection to the malicious domain in the alert was found, indicating a file download of the malicious executable seen in the alert.' }
+];
+const FINDINGS = [
+  { id:1, icon:'shield', title:'True positive: activity confirmed malicious', text:'The investigation confirmed the activity was malicious.', source:'EDR Enrichment Agent summary', target:{step:'edr'} },
+  { id:2, icon:'file', title:'One malicious file identified', text:'The file executed on the device has a malicious reputation.', source:'FlowSHA256HashMaliciousCheck', target:{tool:'t-hash'} },
+  { id:3, icon:'globe', title:'One malicious domain: moereng.com', text:'The domain has a malicious reputation.', source:'FlowDomainMaliciousCheck', target:{tool:'t-domain'} },
+  { id:4, icon:'laptop', title:'Infection limited to one process on one device', text:'Only jackson.miller was seen logging into the device; one connection to the malicious domain was found.', source:'FlowDeviceDomainConnections, FlowUsersLoggedIntoDevice', target:{tool:'t-conn'} }
+];
+const ENT = [
+  { id:'alert', type:'MS Sentinel alert', value:'Black Basta ransomware…', kind:'alert', x:110, y:260, icon:'shield', mal:false, rel:'Raised on the device', summary:'The Microsoft Sentinel alert that started this investigation, received Dec 2, 2024 at 11:06:31 AM. Source severity: Low.', json:{type:'alert',source:'Microsoft Sentinel',name:'Black Basta ransomware was prevented',severity:'Low'} },
+  { id:'device', type:'Device', value:'JACKSON-LAPTOP-7334', kind:'device', x:440, y:260, icon:'laptop', mal:false, rel:'Hub: the device named in the alert', summary:'One process execution was observed on this device. Jackson Miller was the only user seen logging into it around the time of the alert.', json:{type:'device',hostname:'JACKSON-LAPTOP-7334'} },
+  { id:'user', type:'User', value:'jackson.miller', kind:'device', x:790, y:90, icon:'user', mal:false, rel:'Logged into the device', summary:'The primary user of the device and the only user seen logging in around the time of the alert.', json:{type:'user',account:'jackson.miller',name:'Jackson Miller'} },
+  { id:'file', type:'File', value:'Malicious file', kind:'hash', x:790, y:260, icon:'file', mal:true, rel:'Executed on the device', summary:'The file executed on the device. Its reputation is malicious. The file name and hash are not recorded in this report.', json:{type:'file',verdict:'malicious',name:'(not recorded)'} },
+  { id:'domain', type:'Domain', value:'moereng.com', kind:'network', x:790, y:430, icon:'globe', mal:true, rel:'Connected to by the device', summary:'External domain with a malicious reputation. One network connection from the device to it was found.', json:{type:'domain',value:'moereng.com',verdict:'malicious'} }
+];
+const EDGES = [['alert','device'],['device','user'],['device','file'],['device','domain']];
+const KIND_COLOR = { alert:'var(--entity-alert)', device:'var(--chart-elite)', hash:'var(--entity-hash)', network:'var(--entity-network)' };
+
+const state = {
+  reviewed:new Set(), review:'pending', replaying:false, cancelReplay:false, view:'graph', sel:null,
+  zoom:1, pan:{x:0,y:0},
+  history:[
+    { t:'11:06:31 AM', text:'Alert received from Microsoft Sentinel', key:true },
+    { t:'EDR Enrichment Agent', text:'Ran 3 tools' },
+    { t:'Device Agent', text:'Ran 2 tools' },
+    { t:'11:07:09 AM', text:'Conclusion reached: Malicious, escalated (38 sec total)', key:true }
+  ]
+};
+
+/* ---------- toasts ---------- */
+function toast(msg){ const el=document.createElement('div'); el.className='toast'; el.textContent=msg; $('#toasts').appendChild(el); setTimeout(()=>el.remove(),2800); }
+
+/* ---------- accordions ---------- */
+function setExpanded(btn, open){ btn.setAttribute('aria-expanded', open); const p=document.getElementById(btn.getAttribute('aria-controls')); if(p) p.hidden=!open; }
+document.addEventListener('click', e => {
+  const b = e.target.closest('.acc-btn'); if(!b) return;
+  setExpanded(b, b.getAttribute('aria-expanded')!=='true');
+  if(b.dataset.finding && b.getAttribute('aria-expanded')==='true') markReviewed(+b.dataset.finding);
+});
+
+/* ---------- report steps ---------- */
+function stepSummary(s){ const mal = s.tools.filter(t=>t.result==='Malicious').length; return `${s.tools.length} tools${mal?` · ${mal} malicious result${mal>1?'s':''}`:''}`; }
+function renderSteps(){
+  $('#steps').innerHTML = STEPS.map(s => `
+  <div class="step" id="step-${s.id}">
+    <div class="step-head"><button class="acc-btn" aria-expanded="false" aria-controls="stepbody-${s.id}" id="stephead-${s.id}">
+      <span class="node32">${icon(s.icon)}</span>
+      <span style="flex:1;min-width:0"><span class="cardtitle" style="display:block">${esc(s.title)}</span><span class="step-sum caption">${stepSummary(s)} · ${esc(s.teaser)}</span></span>
+      ${icon('chev','chev')}
+    </button></div>
+    <div class="step-body" id="stepbody-${s.id}" hidden>
+      <div class="rail-row" style="min-height:72px"><div class="rail"><span>Input</span></div><div class="rail-content">
+        <div class="input-card"><div><div class="caption">${esc(s.input.label)}</div><div style="font-weight:600">${esc(s.input.value)}</div></div>${s.input.pill?'<span class="pill mal">Malicious</span>':''}</div>
+        ${s.input.note?`<div style="margin-top:8px">${esc(s.input.note)}</div>`:''}
+      </div></div>
+      <div class="rail-row" style="min-height:72px"><div class="rail"><span>Tools</span></div><div class="rail-content" style="padding-top:0">
+        ${s.tools.map(t => `
+        <div class="tool" id="${t.id}">
+          <button class="acc-btn tool-btn" aria-expanded="false" aria-controls="${t.id}-d">
+            ${icon('chev','chev')}
+            <span class="run">${esc(s.agent)} ran <b style="font-weight:600">${t.name}</b></span>
+            ${t.result?`<span class="pill mal">${t.result}</span>`:''}
+            <span class="linkbtn">Request &amp; response</span>
+          </button>
+          <div class="tool-detail" id="${t.id}-d" hidden>
+            <dl class="kv" style="margin:0">
+              <dt>Input</dt><dd>${esc(t.input)}</dd>
+              <dt>Result</dt><dd>${esc(t.text)}</dd>
+              <dt>Query outcome</dt><dd>${outcomePill(t.outcome)}</dd>
+            </dl>
+            <div class="grid2">
+              <div><div class="label">Request</div><pre class="code">tool   ${t.name}\ninput  ${esc(t.input)}</pre></div>
+              <div><div class="label">Response${t.response?' <span class="pill neutral" style="margin-left:6px">Illustrative sample</span>':''}</div><pre class="code">${t.response?esc(t.response):'Not recorded.'}</pre>${t.response?'<div class="caption" style="margin-top:4px">Sample to show the format. The source response is not recorded in this report.</div>':''}</div>
+            </div>
+            <button class="linkbtn" style="margin-top:8px" data-copy="${t.name} ${esc(t.input)}">${icon('copy')} Copy request</button>
+          </div>
+        </div>`).join('')}
+      </div></div>
+      <div class="rail-row" style="min-height:116px"><div class="rail"><span>7AI conclusion<svg class="i sparkle" style="width:10px;height:10px;margin:6px 0 0 0" aria-hidden="true"><use href="#i-sparkle"/></svg></span></div><div class="rail-content" style="padding-top:2px"><p style="margin:0" id="concl-${s.id}">${esc(s.conclusion)}</p></div></div>
+    </div>
+  </div>`).join('');
+}
+function outcomePill(o){ return o==='data'?'<span class="pill ok">Returned data</span>':o==='nomatch'?'<span class="pill neutral">No matches</span>':o==='unavailable'?'<span class="pill warn">Unavailable</span>':'<span class="pill neutral" style="background:transparent;border:1px solid var(--text-secondary)">Not stated</span>'; }
+
+function openStep(id){ const b=$('#stephead-'+id); if(b) setExpanded(b,true); }
+function openTool(id){ const t=document.getElementById(id); if(!t) return; const step=t.closest('.step'); openStep(step.id.replace('step-','')); setExpanded($('.tool-btn',t),true); }
+function flash(el){ el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
+function goTo(el){ el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'center'}); flash(el); }
+
+/* ---------- findings ---------- */
+function renderFindings(){
+  $('#findings').innerHTML = FINDINGS.map(f => `
+  <div class="finding" id="finding-${f.id}">
+    <button class="acc-btn" aria-expanded="false" aria-controls="fb-${f.id}" data-finding="${f.id}">
+      <span class="mk" role="img" aria-label="Not reviewed yet">${icon(f.icon,'ic')}${icon('check','ck')}</span><span style="flex:1;font-weight:600">${esc(f.title)}</span>${icon('chev','chev')}
+    </button>
+    <div class="finding-body" id="fb-${f.id}" hidden>
+      <div>${esc(f.text)}</div>
+      <div class="cap" style="margin-top:8px">Source: ${esc(f.source)}</div>
+      <button class="linkbtn" style="margin-top:4px" data-viewtool="${f.id}">View tool result ›</button>
+    </div>
+  </div>`).join('');
+}
+function openFinding(id){ const b=$(`#finding-${id} .acc-btn`); setExpanded(b,true); markReviewed(id); }
+function markReviewed(id){ if(state.reviewed.has(id)) return; state.reviewed.add(id); const fe=$(`#finding-${id}`); fe.classList.add('reviewed'); $('.mk',fe).setAttribute('aria-label','Reviewed'); $$('[data-reviewed]').forEach(n=>n.textContent=state.reviewed.size); }
+document.addEventListener('click', e => {
+  const c = e.target.closest('.claim'); if(c){ const id=+c.dataset.finding; if($('#rgrid').classList.contains('noaside')) toggleAside(false); openFinding(id); goTo($('#finding-'+id)); }
+  const v = e.target.closest('[data-viewtool]'); if(v){ const f=FINDINGS.find(x=>x.id==v.dataset.viewtool); if(f.target.tool) openTool(f.target.tool); else openStep(f.target.step); goTo(f.target.tool?document.getElementById(f.target.tool):document.getElementById('step-'+f.target.step)); }
+  const cp = e.target.closest('[data-copy]'); if(cp) copyText(cp.dataset.copy,'Request copied');
+});
+
+/* ---------- sources table ---------- */
+function renderSources(){
+  const rows = [
+    { name:'Original alert (Microsoft Sentinel)', tool:null, outcome:'data', text:'Received Dec 2, 2024 at 11:06:31 AM' },
+    { name:'Threat intelligence report', tool:null, outcome:'data', text:'Used as input to the EDR enrichment step' }
+  ];
+  STEPS.forEach(s => s.tools.forEach(t => rows.push({ name:t.evidence, tool:t.name, outcome:t.outcome, text:t.text })));
+  $('#coverageList').innerHTML = rows.map(r=>`<li class="cov-row"><div class="cov-top"><span class="cov-name">${esc(r.name)}</span>${outcomePill(r.outcome)}</div><div class="cov-sub">${r.tool?`<span class="mono">${esc(r.tool)}</span> · `:''}${esc(r.text)}</div></li>`).join('');
+}
+
+/* ---------- history / timeline ---------- */
+function renderTimeline(){
+  const html = state.history.map(h=>`<div class="ev ${h.key?'key':''} ${h.you?'you':''}"><div class="${h.t.match(/\d:\d\d/)?'':'caption'}"><b>${esc(h.t)}</b></div><div>${esc(h.text)}</div></div>`).join('');
+  $('#timelineInline').innerHTML = html; $('#timelineDrawer').innerHTML = html;
+}
+function logEvent(text, key=false){ state.history.push({t:nowTime(), text, key, you:true}); renderTimeline(); if(!$('#drawer').open) $('#histDot').hidden=false; }
+
+/* ---------- dialogs ---------- */
+const dlg = $('#dlg');
+function openDialog({title, body, ok, onOk, focus}){
+  $('#dlgTitle').textContent=title; $('#dlgBody').innerHTML=body; $('#dlgOk').textContent=ok||'Done'; $('#dlgOk').hidden=!onOk; $('#dlgCancel').textContent=onOk?'Cancel':'Close';
+  dlg._onOk = onOk||null; dlg.showModal(); const f=$(focus||'textarea, input',dlg); if(f) f.focus();
+}
+$('#dlgForm').addEventListener('submit', e => { e.preventDefault(); if(dlg._onOk && dlg._onOk()===false) return; dlg.close(); });
+$('#dlgCancel').addEventListener('click', () => dlg.close());
+
+function textDialog(title, label, ok, onSave, required){
+  openDialog({ title, ok, body:`<label class="caption" for="dlgText">${label}</label><textarea class="field" id="dlgText" style="margin-top:6px"></textarea><div class="err" id="dlgErr" hidden></div>`,
+    onOk(){ const v=$('#dlgText').value.trim(); if(required&&!v){ const e=$('#dlgErr'); e.hidden=false; e.textContent='Add a reason before you challenge the verdict.'; $('#dlgText').focus(); return false; } onSave(v); } });
+}
+$('#btnFeedback').addEventListener('click', () => textDialog('Add Feedback','What should we know about this investigation?','Save feedback',v=>{ logEvent('Feedback added'+(v?`: “${v.slice(0,80)}”`:'')); toast('Feedback saved to history'); }));
+$('#btnInsight').addEventListener('click', () => textDialog('Add Alert Insight','What would help the next analyst who sees an alert like this?','Save insight',v=>{ logEvent('Alert insight added'+(v?`: “${v.slice(0,80)}”`:'')); toast('Insight saved to history'); }));
+$('#btnAlertDetails').addEventListener('click', () => openDialog({ title:'Alert details', body:`<dl class="kv" style="margin:0"><dt>Source</dt><dd>Microsoft Sentinel</dd><dt>Received</dt><dd>Dec 2, 2024 at 11:06:31 AM</dd><dt>Type</dt><dd>ransomware was prevented</dd><dt>Device</dt><dd class="mono">JACKSON-LAPTOP-7334</dd><dt>User</dt><dd class="mono">jackson.miller</dd><dt>Severity</dt><dd><span class="pill low">Low</span> as rated by the source</dd></dl>` }));
+$('#btnViewOriginal').addEventListener('click', () => openDialog({ title:'View original alert', body:`<p style="margin:0">The original alert lives in Microsoft Sentinel. A link to it is not recorded in this report, so the prototype cannot open it.</p>` }));
+
+/* ---------- analyst review ---------- */
+function setReview(kind, note){
+  state.review = kind;
+  const pill=$('#reviewPill'); pill.hidden=false; pill.className='pill '+(kind==='confirmed'?'ok':'warn'); pill.textContent=kind==='confirmed'?'Confirmed by analyst':'Challenged by analyst';
+  $('#sigReview').textContent = kind==='confirmed' ? 'Analyst review: confirmed' : 'Analyst review: challenged';
+  $('#reviewStatus').innerHTML = kind==='confirmed' ? `<b>Confirmed</b> by Dennis Nedry at ${esc(nowTime())}.` : `<b>Challenged</b> by Dennis Nedry at ${esc(nowTime())}: “${esc(note||'')}”`;
+}
+function confirmVerdict(){
+  const go = () => { setReview('confirmed'); logEvent(`Verdict confirmed by Dennis Nedry (${state.reviewed.size} of 4 findings reviewed)`, true); toast('Verdict confirmed'); };
+  if(state.reviewed.size<4){
+    openDialog({ title:'Confirm before reviewing the evidence?', ok:'Confirm anyway', onOk:()=>{ go(); },
+      body:`<p style="margin:0">You have reviewed ${state.reviewed.size} of 4 findings. Opening each finding shows the evidence behind it.</p>` });
+    $('#dlgCancel').textContent='Keep reviewing';
+  } else go();
+}
+function challengeVerdict(prefill){
+  openDialog({ title:'Challenge verdict', ok:'Challenge verdict',
+    body:`<label class="caption" for="dlgText">Reason (required)</label><textarea class="field" id="dlgText" style="margin-top:6px">${esc(prefill||'')}</textarea><div class="err" id="dlgErr" hidden></div>`,
+    onOk(){ const v=$('#dlgText').value.trim(); if(!v){ const e=$('#dlgErr'); e.hidden=false; e.textContent='Add a reason before you challenge the verdict.'; $('#dlgText').focus(); return false; } setReview('challenged', v); logEvent(`Verdict challenged by Dennis Nedry: “${v.slice(0,100)}”`, true); toast('Verdict challenged'); } });
+}
+document.addEventListener('click', e => { const a=e.target.closest('[data-act]'); if(!a) return; if(a.dataset.act==='confirm') confirmVerdict(); else challengeVerdict(); });
+$('#goVerdict').addEventListener('click', () => goTo($('.review')));
+
+/* ---------- drawer, menu, status, panel ---------- */
+const drawer=$('#drawer');
+function openHistory(){ $('#histDot').hidden=true; drawer.showModal(); }
+$('#btnHistory').addEventListener('click', openHistory); $('#linkAudit').addEventListener('click', openHistory);
+$('#drawerClose').addEventListener('click', () => drawer.close());
+drawer.addEventListener('click', e => { if(e.target===drawer) drawer.close(); });
+$('#btnStatus').addEventListener('click', () => { goTo($('#sigWorkflow')); });
+function toggleAside(hide){ const g=$('#rgrid'); const h = hide===undefined ? !g.classList.contains('noaside') : hide; g.classList.toggle('noaside',h); const b=$('#btnPanel'); b.setAttribute('aria-pressed',h); b.setAttribute('aria-label',h?'Show side panel':'Hide side panel'); }
+$('#btnPanel').addEventListener('click', () => toggleAside());
+const moreBtn=$('#btnMore'), moreMenu=$('#moreMenu');
+function closeMenu(){ moreMenu.hidden=true; moreBtn.setAttribute('aria-expanded','false'); }
+moreBtn.addEventListener('click', e => { e.stopPropagation(); const open=moreMenu.hidden; moreMenu.hidden=!open; moreBtn.setAttribute('aria-expanded',open); if(open) $('button',moreMenu).focus(); });
+document.addEventListener('click', e => { if(!e.target.closest('#moreMenu')) closeMenu(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeMenu(); });
+async function copyText(text, msg){ try{ await navigator.clipboard.writeText(text); toast(msg); }catch(_){ const t=document.createElement('textarea'); t.value=text; document.body.appendChild(t); t.select(); try{ document.execCommand('copy'); toast(msg); }catch(__){ toast('Copy is blocked in this browser'); } t.remove(); } }
+$('#miCopy').addEventListener('click', () => { closeMenu(); copyText(location.href,'Link copied'); });
+$('#miDownload').addEventListener('click', () => {
+  closeMenu();
+  const md = [
+    '# #142957: ‘Black Basta’ ransomware was prevented on JACKSON-LAPTOP-7334','',
+    '- Status: Escalated · Verdict: Malicious (true positive)','- Source: Microsoft Sentinel · Severity as rated by source: Low',
+    '- 7AI received alert: Dec 2, 2024 at 11:06:31 AM','- 7AI reached a conclusion: Dec 2, 2024 at 11:07:09 AM (38 sec)','',
+    '## 7AI Conclusion','The investigation of the “Black Basta ransomware prevented” alert confirmed the activity was malicious but had minimal blast radius. The user jackson.miller and the device JACKSON-LAPTOP-7334 were investigated, revealing one malicious file and one malicious domain (moereng.com). The alert was determined to be a true positive, but the infection was limited to one process execution on one device.','',
+    '## Findings & evidence', ...FINDINGS.map(f=>`${f.id}. ${f.title} — ${f.text} (Source: ${f.source})`),'',
+    '## Agentic investigation report', ...STEPS.flatMap(s=>[`### ${s.title}`, ...s.tools.map(t=>`- ${s.agent} ran ${t.name}: ${t.text}`), s.conclusion,'']),
+    '## Investigation history', ...state.history.map(h=>`- ${h.t}: ${h.text}`)
+  ].join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([md],{type:'text/markdown'})); a.download='investigation-142957-report.md'; a.click(); URL.revokeObjectURL(a.href); toast('Report downloaded');
+});
+$$('[data-stub]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); toast('Only the investigation page is wired up in this prototype'); }));
+
+/* ---------- expand / collapse all, summary box ---------- */
+$('#btnExpandAll').addEventListener('click', () => { $$('.step .acc-btn[aria-controls^="stepbody"]').forEach(b=>setExpanded(b,true)); $$('.tool-btn').forEach(b=>setExpanded(b,true)); });
+$('#btnCollapseAll').addEventListener('click', () => { $$('.step .acc-btn, .tool-btn').forEach(b=>setExpanded(b,false)); });
+
+/* ---------- replay ---------- */
+const sleep = ms => new Promise(r=>setTimeout(r, matchMedia('(prefers-reduced-motion:reduce)').matches?Math.min(ms,150):ms));
+function setReplayUI(on){ state.replaying=on; $('#replayLabel').textContent=on?'Stop':'Replay'; $('#replayIcon').innerHTML=`<use href="#i-${on?'stop':'play'}"/>`; $('#btnReplay').setAttribute('aria-pressed',on); }
+async function replay(){
+  if(state.replaying){ state.cancelReplay=true; return; }
+  state.cancelReplay=false; setReplayUI(true); $('#btnCollapseAll').click(); $('#report').scrollIntoView({block:'start'});
+  const stop = () => state.cancelReplay;
+  for(const s of STEPS){
+    if(stop()) break; openStep(s.id); goTo($('#step-'+s.id)); await sleep(900);
+    for(const t of s.tools){ if(stop()) break; setExpanded($('.tool-btn',document.getElementById(t.id)),true); const el=document.getElementById(t.id); flash(el); await sleep(900); }
+    if(stop()) break; const c=$('#concl-'+s.id); c.classList.add('hl'); await sleep(1100); c.classList.remove('hl');
+  }
+  setReplayUI(false); toast(stop()?'Replay stopped':'Replay finished: 5 tools run across 2 agents');
+}
+$('#btnReplay').addEventListener('click', replay);
+
+/* ---------- entity map ---------- */
+const map=$('#map'), stage=$('#stage');
+function renderMap(){
+  stage.insertAdjacentHTML('beforeend', ENT.map(n=>`
+    <button class="node ${n.mal?'mal':''}" data-id="${n.id}" aria-pressed="false" style="left:${n.x}px;top:${n.y}px" aria-label="${esc(n.type)}: ${esc(n.value)}${n.mal?', malicious':''}">
+      <span class="nhalo"><span class="ndisc" style="background:${KIND_COLOR[n.kind]};${n.kind==='hash'?'color:var(--text-primary)':''}">${icon(n.icon)}</span></span>
+      <span class="ntype">${esc(n.type)}</span><span class="nval">${esc(n.value)}</span>
+    </button>`).join(''));
+  $('#edges').innerHTML = EDGES.map(([a,b])=>{ const A=ENT.find(n=>n.id===a), B=ENT.find(n=>n.id===b); const x1=A.x+22,y1=A.y,x2=B.x-22,y2=B.y,xm=(x1+x2)/2; return `<path d="M${x1} ${y1} C ${xm} ${y1}, ${xm} ${y2}, ${x2} ${y2}"/>`; }).join('');
+  $('#entityRows').innerHTML = ENT.map(n=>`<tr><td>${esc(n.type)}</td><td class="mono">${esc(n.value)}</td><td>${n.mal?'<span class="pill mal">Malicious</span>':'<span class="pill neutral">Context</span>'}</td><td>${esc(n.rel)}</td></tr>`).join('');
+  fitMap();
+}
+function applyView(){ stage.style.transform=`translate(${state.pan.x}px,${state.pan.y}px) scale(${state.zoom})`; }
+function fitMap(){ const r=map.getBoundingClientRect(); const z=Math.min(1,(r.width-40)/1000,(r.height-40)/520); state.zoom=Math.max(.5,z); state.pan.x=(r.width-1000*state.zoom)/2; state.pan.y=(r.height-520*state.zoom)/2; applyView(); }
+function zoomBy(f){ const r=map.getBoundingClientRect(), cx=r.width/2, cy=r.height/2, z=Math.min(2,Math.max(.4,state.zoom*f)), k=z/state.zoom; state.pan.x=cx-(cx-state.pan.x)*k; state.pan.y=cy-(cy-state.pan.y)*k; state.zoom=z; applyView(); }
+$('#zIn').addEventListener('click',()=>zoomBy(1.2)); $('#zOut').addEventListener('click',()=>zoomBy(1/1.2)); $('#zFit').addEventListener('click',fitMap);
+map.addEventListener('wheel', e => { if(!(e.ctrlKey||e.metaKey)) return; e.preventDefault(); zoomBy(e.deltaY<0?1.1:1/1.1); }, {passive:false});
+let drag=null;
+map.addEventListener('pointerdown', e => { if(e.target.closest('.node,.mappanel,.mapctl')) return; drag={x:e.clientX-state.pan.x,y:e.clientY-state.pan.y}; map.classList.add('dragging'); map.setPointerCapture(e.pointerId); });
+map.addEventListener('pointermove', e => { if(!drag) return; state.pan.x=e.clientX-drag.x; state.pan.y=e.clientY-drag.y; applyView(); });
+map.addEventListener('pointerup', () => { drag=null; map.classList.remove('dragging'); });
+window.addEventListener('resize', () => { if(state.view==='graph') fitMap(); });
+
+function selectEntity(id){
+  state.sel=id; $$('.node').forEach(n=>n.setAttribute('aria-pressed',n.dataset.id===id));
+  const n=ENT.find(x=>x.id===id), p=$('#mapPanel'); p.hidden=false;
+  p.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div><div class="label">${esc(n.type)}</div><div class="cardtitle" style="word-break:break-word;margin-top:2px">${esc(n.value)}</div></div><button class="btn icon" id="panelClose" aria-label="Close details">${icon('x')}</button></div>
+  <div style="margin:8px 0 12px">${n.mal?'<span class="pill mal">Malicious</span>':'<span class="pill neutral">Context</span>'}</div>
+  <div style="display:flex;gap:16px;margin-bottom:16px"><button class="linkbtn" id="pCopy">${icon('copy')} Copy value</button><button class="linkbtn" id="pInsight">${icon('bulb')} Add insight</button></div>
+  <div class="label">7AI summary</div><p style="margin:4px 0 16px">${esc(n.summary)}</p>
+  <div class="label">Relationship</div><p style="margin:4px 0 16px">${esc(n.rel)}</p>
+  <div class="label">Value</div><pre class="code">${esc(JSON.stringify(n.json,null,2))}</pre>`;
+  $('#panelClose').addEventListener('click',()=>{ p.hidden=true; state.sel=null; $$('.node').forEach(x=>x.setAttribute('aria-pressed','false')); });
+  $('#pCopy').addEventListener('click',()=>copyText(n.json.value||n.json.hostname||n.json.account||n.json.name,'Value copied'));
+  $('#pInsight').addEventListener('click',()=>textDialog('Add Alert Insight',`What should analysts know about ${esc(n.value)}?`,'Save insight',v=>{ logEvent(`Insight added on ${n.type.toLowerCase()} ${n.value}`+(v?`: “${v.slice(0,80)}”`:'')); toast('Insight saved to history'); }));
+}
+document.addEventListener('click', e => { const n=e.target.closest('.node'); if(n) selectEntity(n.dataset.id); });
+function setView(v){ state.view=v; $('#graphView').hidden=v!=='graph'; $('#tableView').hidden=v!=='table'; $('#vGraph').setAttribute('aria-pressed',v==='graph'); $('#vTable').setAttribute('aria-pressed',v==='table'); $('#btnMapSize').hidden=v!=='graph'; if(v==='graph') fitMap(); }
+$('#vGraph').addEventListener('click',()=>setView('graph')); $('#vTable').addEventListener('click',()=>setView('table'));
+$('#btnMapSize').addEventListener('click', () => { const big=map.classList.toggle('big'); $('#btnMapSize span').textContent=big?'Shrink map':'Enlarge map'; fitMap(); });
+
+/* ---------- tab scrollspy ---------- */
+const chrome=$('.chrome');
+const setChrome=()=>document.documentElement.style.setProperty('--chrome-h', chrome.offsetHeight+'px');
+setChrome(); window.addEventListener('resize', setChrome);
+const tabs=$$('.tab');
+const io=new IntersectionObserver(es=>{ es.forEach(en=>{ if(en.isIntersecting){ tabs.forEach(t=>t.setAttribute('aria-current', t.getAttribute('href')==='#'+en.target.id)); } }); },{rootMargin:`-${chrome.offsetHeight+16}px 0px -60% 0px`});
+['summary','report','remediation','artifacts'].forEach(id=>io.observe(document.getElementById(id)));
+$$('[data-reviewlink]').forEach(a=>a.addEventListener('click',()=>{ if($('#rgrid').classList.contains('noaside')) toggleAside(false); }));
+
+/* ---------- "View reasoning" panels on the signal cards ---------- */
+const REASONS = {
+  severity:{ title:'Why the source severity is Low',
+    paras:['Microsoft Sentinel rated this alert Low. 7AI does not change the source’s rating, so it stays next to the verdict.','The alert type is “ransomware was prevented”. The report does not say how Sentinel arrived at Low.','Source severity describes the alert as Sentinel raised it. The 7AI verdict describes what the investigation found, so the two can differ.'],
+    links:[['View original alert details','alertdetails'],['See where the alert came from','el:#sourcesCard']] },
+  verdict:{ title:'Why 7AI concluded Malicious (true positive)',
+    paras:['This verdict rests on four findings. Open one to see the tool result behind it.'],
+    items:[['The investigation confirmed the activity was malicious.','finding:1'],['The file executed on the device has a malicious reputation.','finding:2'],['The domain moereng.com has a malicious reputation.','finding:3'],['One network connection from the device to the malicious domain was found.','finding:4']] },
+  scope:{ title:'Why the scope is 1 device · 1 process',
+    paras:['The Device Agent found that Jackson Miller was the only user seen logging into the device around the time of the alert, and one network connection to the malicious domain.','The conclusion limits the infection to one process execution on one device, so the blast radius is minimal. Investigated: user jackson.miller and device JACKSON-LAPTOP-7334.'],
+    links:[['Open the supporting finding','finding:4'],['Open the Device Agent step','step:device']] },
+  workflow:{ title:'Why this is Escalated',
+    paras:['The investigation is complete: 7AI reached its conclusion at 11:07:09 AM, 38 seconds after the alert arrived.','The alert is a true positive with a Malicious verdict, and it is marked Escalated. The report does not state a separate escalation rule.','Response actions: none documented in this report.'],
+    links:[['Open audit & review','el:#remediation']] }
+};
+function runAction(a){
+  const [k,v]=a.split(':');
+  if(k==='finding'){ if($('#rgrid').classList.contains('noaside')) toggleAside(false); openFinding(+v); goTo($('#finding-'+v)); }
+  else if(k==='step'){ openStep(v); goTo($('#step-'+v)); }
+  else if(k==='tool'){ openTool(v); goTo(document.getElementById(v)); }
+  else if(k==='el'){ goTo($(v)); }
+  else if(a==='alertdetails'){ $('#btnAlertDetails').click(); }
+}
+function closeReasoning(){ const r=$('#reasoning'); r.hidden=true; $$('[data-reason]').forEach(b=>b.setAttribute('aria-expanded','false')); $$('.sig').forEach(c=>c.classList.remove('active')); }
+function openReasoning(key){
+  const btn=$(`[data-reason="${key}"]`), r=$('#reasoning'), d=REASONS[key];
+  if(btn.getAttribute('aria-expanded')==='true'){ closeReasoning(); return; }
+  closeReasoning(); btn.setAttribute('aria-expanded','true'); $(`[data-sig="${key}"]`).classList.add('active');
+  r.innerHTML=`<div style="min-width:0"><div class="cardtitle" style="margin-bottom:8px">${esc(d.title)}</div>${d.paras.map(p=>`<p>${esc(p)}</p>`).join('')}${d.items?`<ul>${d.items.map(i=>`<li>${esc(i[0])} <button class="linkbtn" data-run="${i[1]}">Open finding ›</button></li>`).join('')}</ul>`:''}${d.links?`<div class="acts">${d.links.map(l=>`<button class="linkbtn" data-run="${l[1]}">${esc(l[0])} ›</button>`).join('')}</div>`:''}</div><button class="btn icon" id="reasonClose" aria-label="Close reasoning">${icon('x')}</button>`;
+  r.hidden=false; $('#reasonClose').addEventListener('click',()=>{ closeReasoning(); btn.focus(); });
+}
+document.addEventListener('click', e => { const b=e.target.closest('[data-reason]'); if(b) openReasoning(b.dataset.reason); else { const card=e.target.closest('.sig[data-sig]'); if(card && !window.getSelection().toString()) openReasoning(card.dataset.sig); } const run=e.target.closest('[data-run]'); if(run) runAction(run.dataset.run); });
+document.addEventListener('keydown', e => { if(e.key==='Escape' && !$('#reasoning').hidden && !dlg.open && !drawer.open){ const open=$('[data-reason][aria-expanded="true"]'); closeReasoning(); if(open) open.focus(); } });
+
+/* ---------- init ---------- */
+renderSteps(); renderFindings(); renderSources(); renderTimeline(); renderMap();
+openTool('t-domain');
+})();
+</script>
+</body>
+</html>
