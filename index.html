@@ -98,9 +98,9 @@ section[id]{scroll-margin-top:calc(var(--chrome-h,133px) + 24px)}
 .verdict{display:flex;flex-direction:column;gap:24px}
 .vtop{display:flex;justify-content:space-between;align-items:center;gap:32px;flex-wrap:wrap}
 .vleft{display:flex;align-items:center;gap:24px;flex:1 1 640px;min-width:0}
-.halo{width:72px;height:72px;border-radius:50%;background:var(--danger-soft);display:grid;place-items:center;flex:none}
-.shield{width:56px;height:56px;border-radius:50%;background:var(--danger);display:grid;place-items:center;color:var(--text-primary)}
-.shield .i{width:28px;height:28px}
+.halo{width:60px;height:60px;border-radius:50%;background:var(--danger-soft);display:grid;place-items:center;flex:none}
+.shield{width:46px;height:46px;border-radius:50%;background:var(--danger);display:grid;place-items:center;color:var(--text-primary)}
+.shield .i{width:24px;height:24px}
 .vtitle{font-size:20px;line-height:26px;font-weight:600;text-decoration:underline;text-underline-offset:3px;margin:8px 0}
 .stamps{display:flex;align-items:center;gap:24px}
 .stamp b{display:block;font-weight:400;font-size:13px;color:var(--text-primary)}
@@ -451,10 +451,13 @@ tr.arow:hover td{background:#fafaff}
 
   <div class="vcard" id="verdictZone">
     <div class="vtop">
-      <div style="min-width:0">
+      <div class="vleft">
+        <div class="halo"><div class="shield"><svg class="i" aria-hidden="true"><use href="#i-shield"/></svg></div></div>
+        <div style="min-width:0">
         <div class="eyebrow">Microsoft Sentinel alert for ransomware was prevented</div>
         <h1 class="vtitle2">‘Black Basta’ ransomware was prevented on JACKSON-LAPTOP-7334</h1>
         <div class="vmeta"><span class="pill mal">Malicious</span><span class="pill neutral">Escalated</span><span class="pill ok" id="reviewPill" hidden></span></div>
+        </div>
       </div>
       <div class="vtime" title="7AI received the alert at 11:06:31 AM and reached a conclusion at 11:07:09 AM"><b>Completed in 38 seconds</b><span>Dec 2, 2024 · 11:06:31–11:07:09 AM</span></div>
     </div>
