@@ -374,7 +374,7 @@ details.hs-list li{margin-bottom:8px}
       <li><button data-i="5" title="Final design"><span class="n">06</span><span class="t">Final design</span></button></li>
     </ol>
     <div class="rail-foot">
-      <div><a href="https://7ai-project.netlify.app/" target="_blank" rel="noopener">Live prototype ↗</a> &nbsp;·&nbsp; <a href="https://www.figma.com/design/0s6eOkK9W3l8zAZXhKB0B5/HomeTask---Visual-KMM?node-id=2002-49&amp;t=8UsjdtzNgMDls47S-1" target="_blank" rel="noopener">Figma ↗</a></div>
+      <div><a href="https://7ai-project.netlify.app/" id="liveProto" target="_blank" rel="noopener">Live prototype ↗</a> &nbsp;·&nbsp; <a href="https://www.figma.com/design/0s6eOkK9W3l8zAZXhKB0B5/HomeTask---Visual-KMM?node-id=2002-49&amp;t=8UsjdtzNgMDls47S-1" target="_blank" rel="noopener">Figma ↗</a></div>
       <div><kbd>←</kbd> <kbd>→</kbd> sections &nbsp;·&nbsp; <kbd>1</kbd>–<kbd>6</kbd> jump &nbsp;·&nbsp; <kbd>[</kbd> panel &nbsp;·&nbsp; <kbd>R</kbd> decisions</div>
     </div>
   </nav>
@@ -699,6 +699,22 @@ section[id]{scroll-margin-top:calc(var(--chrome-h,133px) + 24px)}
 .pill.ok{background:var(--success-soft);color:var(--success-text);border-radius:var(--radius-sm)}
 .pill.neutral{background:var(--neutral-chip);color:var(--text-primary)}
 .pill.warn{background:var(--warning);color:var(--text-primary)}
+.pill.rv{border-radius:var(--radius-sm)}
+.pill.rv-need{background:var(--accent-soft);color:var(--accent-ink)}
+.pill.rv-dis{background:var(--info-soft);color:var(--info-text)}
+.pill.rv-t2{background:var(--code-chip);color:var(--text-secondary,#4a5058)}
+.chal{margin-left:8px;font-size:12px;font-weight:600;color:#2a6582;white-space:nowrap}
+.chal svg{vertical-align:-1px;margin-right:4px}
+.pill.c-sus{background:#fbe2c8;color:#7a3f0c}
+.pill.c-inc{background:#f3ecc4;color:#5f5212}
+.pill.c-ben{background:#d9eedf;color:#245c37}
+#ovTable .pill{border-radius:var(--radius-sm)}
+#ovTable .pill.rv{background:none;padding:0;height:auto}
+#ovTable .pill.rv.ok{color:#2f6a4c}
+#ovTable .pill.rv-need{color:var(--accent-ink)}
+#ovTable .pill.rv-dis{color:#2a6582}
+#ovTable .pill.rv-t2{color:var(--text-secondary)}
+.upg{cursor:help;display:inline-block;margin-left:6px;padding:0 3px;font-size:13px;font-weight:700;line-height:1;color:var(--danger-text)}
 
 /* verdict zone */
 .verdict{display:flex;flex-direction:column;gap:24px}
@@ -1302,7 +1318,7 @@ body[data-screen="list"] .lsub{display:flex}
       <div class="cell" data-sig="severity"><span class="label">Source severity</span><span class="val">Low</span><span class="sub">Rated by Microsoft Sentinel</span><button class="reason-link" data-reason="severity" aria-expanded="false" aria-controls="reasoning" title="View reasoning"><span class="sr-only">View reasoning for source severity</span><svg class="i cv" aria-hidden="true"><use href="#i-chevd"/></svg></button></div>
       <div class="cell" data-sig="verdict"><span class="label">7AI concluded<svg class="i sparkle" aria-hidden="true"><use href="#i-sparkle"/></svg></span><span class="val"><i class="dotred" aria-hidden="true"></i>Malicious</span><span class="sub">True positive</span><button class="reason-link" data-reason="verdict" aria-expanded="false" aria-controls="reasoning" title="View reasoning"><span class="sr-only">View reasoning for the 7AI conclusion</span><svg class="i cv" aria-hidden="true"><use href="#i-chevd"/></svg></button></div>
       <div class="cell" data-sig="scope"><span class="label">Observed scope</span><span class="val">1 device · 1 process</span><span class="sub">Minimal blast radius</span><button class="reason-link" data-reason="scope" aria-expanded="false" aria-controls="reasoning" title="View reasoning"><span class="sr-only">View reasoning for observed scope</span><svg class="i cv" aria-hidden="true"><use href="#i-chevd"/></svg></button></div>
-      <div class="cell" id="sigWorkflow" data-sig="workflow"><span class="label">Workflow</span><span class="val">Escalated by 7AI</span><span class="sub" id="sigReview">Waiting for approval from Tier 1 Analyst</span><button class="reason-link" data-reason="workflow" aria-expanded="false" aria-controls="reasoning" title="View reasoning"><span class="sr-only">View reasoning for workflow</span><svg class="i cv" aria-hidden="true"><use href="#i-chevd"/></svg></button></div>
+      <div class="cell" id="sigWorkflow" data-sig="workflow"><span class="label">Workflow</span><span class="val">Escalated by 7AI</span><span class="sub" id="sigReview">Analyst review: pending</span><button class="reason-link" data-reason="workflow" aria-expanded="false" aria-controls="reasoning" title="View reasoning"><span class="sr-only">View reasoning for workflow</span><svg class="i cv" aria-hidden="true"><use href="#i-chevd"/></svg></button></div>
     </div>
     <div class="reasoning" id="reasoning" role="region" aria-live="polite" aria-label="Reasoning" hidden></div>
   </div>
@@ -1918,7 +1934,7 @@ function renderNote(){
   const why = `<b>Why the ratings differ.</b> Sentinel rated this alert Low. 7AI found a malicious file and a malicious domain, so it concluded Malicious. <button type="button" class="linkbtn" data-jump="severity">View reasoning ›</button>`;
   if(v==='t1') n.innerHTML = `${icon('info')}<div>${why}</div>`;
   else if(v==='t2'){
-    const who = state.lead==='disagreed' ? `<b>Reopened by the leader.</b> “${esc(state.leadNote)}”.` : (()=>{ const e = escEff(); return e ? `<b>Escalated by 7AI.</b> Tier 1 Analyst reviewed it and sent it to Tier 2${e.t?' at '+esc(e.t.replace(/:\d\d (AM|PM)/,' $1')):''}: “${esc(e.reason)}”` : `<b>Escalated by 7AI.</b> Waiting for approval from Tier 1 Analyst.`; })();
+    const who = state.lead==='disagreed' ? `<b>Reopened by the leader.</b> “${esc(state.leadNote)}”.` : (()=>{ const e = escEff(); return e ? `<b>Escalated by 7AI.</b> Tier 1 Analyst reviewed it and sent it to Tier 2${e.t?' at '+esc(e.t.replace(/:\d\d (AM|PM)/,' $1')):''}: “${esc(e.reason)}”` : `<b>Escalated by 7AI.</b> Analyst review: pending.`; })();
     n.innerHTML = `<div class="pn esc">${icon('escal')}<div>${who}${(state.lead==='disagreed'||escEff())?' Assigned to you.':''}</div></div><div class="pn">${icon('info')}<div>${why}</div></div>`;
   } else {
     const st = (P, role, status) => `<div class="cstep"><span class="cav" style="background-image:url(${P.img})"></span><div><b>${esc(P.name)}</b><span class="s">${role} · ${esc(status[0].toUpperCase()+status.slice(1))}</span></div></div>`;
@@ -1934,7 +1950,7 @@ function updateStatus(){
   $('#reviewedBy').textContent = by.join(', ') || 'Nobody yet';
   const dis = t1==='challenged' || t2==='challenged' || ld==='disagreed';
   $('#flagText').textContent = ld==='disagreed' ? 'The leader disagreed with an analyst decision. The case is reopened for Tier 2.' : dis ? 'An analyst challenged 7AI on this case. It is under review.' : 'No analyst has disagreed with 7AI on this case.';
-  let sub = 'Waiting for approval from Tier 1 Analyst', pill = null, cls = 'ok';
+  let sub = 'Analyst review: pending', pill = null, cls = 'ok';
   if(ld==='disagreed'){ sub='Reopened by the leader'; pill='Reopened by leader'; cls='warn'; }
   else if(t2==='escalated'){ sub='Escalated to the leader'; pill='With the leader'; cls='warn'; }
   else if(t2==='confirmed'){ sub='Confirmed by Tier 2'; pill='Confirmed by Tier 2'; }
@@ -2010,10 +2026,10 @@ function renderOversight(){
   const kind0 = $('#ovKind').value; $('#ovStats').innerHTML = [['all',rows.length,'Investigations'],['flag',flagged,'Analyst challenged'],['need',need,'Need your review'],['done',done,'Reviewed by you']].map(([k,n,l]) => `<button type="button" class="stat" data-stat="${k}" aria-pressed="${kind0===k}"><b>${n}</b><span>${l}</span></button>`).join('');
   const who = $('#ovWho').value, kind = $('#ovKind').value;
   const list = rows.filter(r => (who==='all' || (r[who] && r[who].d)) && (kind==='all' || (kind==='need'&&r.lead==='pending') || (kind==='flag'&&rowFlag(r)) || (kind==='done'&&(r.lead==='approved'||r.lead==='disagreed'))));
-  const vp = v => v==='Malicious' ? '<span class="pill mal">Malicious</span>' : v==='Suspicious' ? '<span class="pill warn">Suspicious</span>' : `<span class="pill neutral">${esc(v)}</span>`;
+  const vp = v => v==='Malicious' ? '<span class="pill mal">Malicious</span>' : v==='Suspicious' ? '<span class="pill c-sus">Suspicious</span>' : v==='Benign' ? '<span class="pill c-ben">Benign</span>' : v==='Inconclusive' ? '<span class="pill c-inc">Inconclusive</span>' : `<span class="pill neutral">${esc(v)}</span>`;
   const dec = d => d ? `<b style="font-weight:500">${esc(d.d[0].toUpperCase()+d.d.slice(1))}</b><div class="caption">${esc(d.who)}</div>` : '<span class="caption">—</span>';
-  const led = r => r.lead==='approved' ? '<span class="pill ok">Approved</span>' : r.lead==='disagreed' ? '<span class="pill warn">Disagreed</span>' : r.lead==='pending' ? '<span class="pill warn">Needs review</span>' : r.withT2 ? '<span class="pill neutral">With Tier 2</span>' : '<span class="caption">—</span>';
-  $('#ovRows').innerHTML = list.map(r => `<tr class="arow" data-case="${r.id}" tabindex="0"><td><b style="font-weight:${r.live?600:500}">${esc(r.title)}</b>${rowFlag(r)?' <span class="pill neutral">Challenged</span>':''}${r.live?' <span class="linkbtn" style="margin-left:6px">Open case ›</span>':''}<div class="caption">#${r.id} · ${esc(r.src)}</div></td><td>${vp(r.verdict)}</td><td>${r.sev==='Low'?'<span class="pill low">Low</span>':esc(r.sev)}</td><td>${dec(r.t1)}</td><td>${dec(r.t2)}</td><td>${led(r)}</td><td class="caption" style="white-space:nowrap">${esc(r.when)}</td></tr>`).join('') || '<tr><td colspan="7" class="caption">No investigations match these filters.</td></tr>';
+  const led = r => r.lead==='approved' ? '<span class="pill rv ok">Approved</span>' : r.lead==='disagreed' ? '<span class="pill rv rv-dis">Disagreed</span>' : r.lead==='pending' ? '<span class="pill rv rv-need">Needs review</span>' : r.withT2 ? '<span class="pill rv rv-t2">With Tier 2</span>' : '<span class="caption">—</span>';
+  $('#ovRows').innerHTML = list.map(r => `<tr class="arow" data-case="${r.id}" tabindex="0"><td><b style="font-weight:${r.live?600:500}">${esc(r.title)}</b>${rowFlag(r)?' <span class="chal" title="An analyst challenged 7AI’s conclusion"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M3.5 14V2.5M3.5 2.5h8l-1.6 3 1.6 3h-8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Challenged</span>':''}${r.live?' <span class="linkbtn" style="margin-left:6px">Open case ›</span>':''}<div class="caption">#${r.id} · ${esc(r.src)}</div></td><td>${vp(r.verdict)}</td><td>${esc(r.sev)}${r.verdict==='Malicious'&&r.sev!=='High'?`<span class="upg" title="7AI rated this as a higher risk" role="img" aria-label="7AI rated this as a higher risk">↑</span>`:''}</td><td>${dec(r.t1)}</td><td>${dec(r.t2)}</td><td>${led(r)}</td><td class="caption" style="white-space:nowrap">${esc(r.when)}</td></tr>`).join('') || '<tr><td colspan="7" class="caption">No investigations match these filters.</td></tr>';
 }
 function exportList(){
   const rows = [liveRow(), ...SAMPLE], q = v => `"${String(v==null?'':v).replace(/"/g,'""')}"`;
@@ -2256,6 +2272,11 @@ proto.addEventListener('load', () => {
   if (want) setTimeout(enableOverlay, 60);
 });
 proto.srcdoc = $('#proto-src').textContent.replace(/<\\\/script/gi, '</script');
+/* "Live prototype" opens the same prototype embedded in this walkthrough, full page in a new tab */
+(function(){ const a=document.getElementById('liveProto'); if(!a) return; let url=null;
+  a.addEventListener('click', e => { e.preventDefault();
+    if(!url) url = URL.createObjectURL(new Blob([$('#proto-src').textContent.replace(/<\\\/script/gi, '</script')], {type:'text/html'}));
+    window.open(url, '_blank', 'noopener'); }); })();
 
 /* ---------- chapters ---------- */
 const ids = ['discovery','comments','competitive','wireframing','journeys','final'];
