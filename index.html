@@ -683,6 +683,8 @@ section[id]{scroll-margin-top:calc(var(--chrome-h,133px) + 24px)}
 .pill.esc{padding:0;color:var(--danger-text)}
 .vesc{display:inline-flex;align-items:center;gap:4px;height:18px;font:700 10px/14px var(--font);letter-spacing:.06em;text-transform:uppercase;color:#9a5a00;white-space:nowrap}
 .vesc .i{width:12px;height:12px;stroke-width:2.5}
+.pill.withlead,.pill.warn.withlead{background:none;padding:0;border-radius:0;color:#9a5a00;font:700 10px/14px var(--font);letter-spacing:.06em;text-transform:uppercase}
+body[data-view="lead"] .pill.withlead{display:none}
 #audit .audbody>.grow{flex:0 0 auto}
 .pill.low{background:#1d2127;color:#fff}
 .pill.ok{background:var(--success-soft);color:var(--success-text);border-radius:var(--radius-sm)}
@@ -709,9 +711,16 @@ section[id]{scroll-margin-top:calc(var(--chrome-h,133px) + 24px)}
 .verdict{display:flex;flex-direction:column;gap:24px}
 .vtop{display:flex;justify-content:space-between;align-items:center;gap:32px;flex-wrap:wrap}
 .vleft{display:flex;align-items:center;gap:24px;flex:1 1 640px;min-width:0}
-.halo{width:60px;height:60px;border-radius:50%;background:var(--danger-soft);display:grid;place-items:center;flex:none}
+.halo{position:relative;width:60px;height:60px;border-radius:50%;background:var(--danger-soft);display:grid;place-items:center;flex:none}
 .shield{width:46px;height:46px;border-radius:50%;background:var(--danger);display:grid;place-items:center;color:var(--text-primary)}
 .shield .i{width:24px;height:24px}
+.rbadge{display:none;position:absolute;right:-8px;bottom:-8px;width:30px;height:30px;border-radius:50%;background:#2e7d5b;color:#fff;border:3px solid var(--surface);place-items:center;box-shadow:0 1px 3px rgba(29,33,39,.25)}
+.rbadge .i{width:17px;height:17px;stroke-width:3.2}
+.vtop.remed .halo{background:#cfe3d9}
+.vtop.remed .shield{background:#2e7d5b;color:#fff}
+.vtop.remed .rbadge{display:grid}
+.vtop.remed .vesc{display:none}
+.vtop.remed .pill.ok#remPill{background:#cfe3d9;color:#1f5a41;font-weight:700}
 .vtitle{font-size:20px;line-height:26px;font-weight:600;text-decoration:underline;text-underline-offset:3px;margin:8px 0}
 .stamps{display:flex;align-items:center;gap:24px}
 .stamp b{display:block;font-weight:400;font-size:13px;color:var(--text-primary)}
@@ -1070,6 +1079,8 @@ body[data-screen="list"] #verdictZone,body[data-screen="list"] .tabs,body[data-s
 .cstep{display:flex;align-items:center;gap:10px}
 .cstep b{display:block;font-size:13px;font-weight:600}
 .cstep .s{display:block;font-size:12px;color:var(--text-secondary)}
+.stw.amber{color:#9a5a00}
+.stw.green{color:#1f5a41}
 .cav{width:32px;height:32px;border-radius:50%;background:var(--neutral-chip) center/cover no-repeat;display:grid;place-items:center;flex:none;color:var(--accent-ink)}
 .cav.ai{background:var(--accent-soft)}
 .cav .i{width:16px;height:16px}
@@ -1445,11 +1456,11 @@ body.boot #colL>*:nth-child(4),body.boot #colR>*:nth-child(4){animation-delay:.6
   <div class="vcard" id="verdictZone">
     <div class="vtop">
       <div class="vleft">
-        <div class="halo"><div class="shield"><svg class="i" aria-hidden="true"><use href="#i-shield"/></svg></div></div>
+        <div class="halo"><div class="shield"><svg class="i" aria-hidden="true"><use href="#i-shield"/></svg></div><span class="rbadge" aria-hidden="true"><svg class="i"><use href="#i-check"/></svg></span></div>
         <div style="min-width:0">
         <div class="eyebrow">Microsoft Sentinel alert for ransomware was prevented</div>
         <h1 class="vtitle2">‘Black Basta’ ransomware was prevented on <span style="white-space:nowrap">JACKSON-LAPTOP-7334</span></h1>
-        <div class="vmeta"><span class="pill mal">Malicious</span><span class="vesc"><svg class="i" aria-hidden="true"><use href="#i-escal"/></svg>Escalated</span><span class="pill ok" id="reviewPill" hidden></span><span class="pill pill-live">Investigating</span></div>
+        <div class="vmeta"><span class="pill mal">Malicious</span><span class="pill ok" id="remPill" hidden></span><span class="vesc"><svg class="i" aria-hidden="true"><use href="#i-escal"/></svg>Escalated</span><span class="pill ok" id="reviewPill" hidden></span><span class="pill pill-live">Investigating</span></div>
         </div>
       </div>
       <div class="vtime" title="7AI received the alert at 11:06:31 AM and reached a conclusion at 11:07:09 AM"><b>Completed in 38 seconds</b><span>Dec 2, 2024 · 11:06:31–11:07:09 AM</span></div>
@@ -1897,10 +1908,12 @@ document.addEventListener('click', e => { const a=e.target.closest('[data-remrun
 updRem();
 
 function updRemFoot(){
+  const vt = $('.vtop'), rp = $('#remPill'), c0 = state.remClosed;
+  if(vt){ vt.classList.toggle('remed', !!c0); if(rp){ rp.hidden = !c0; rp.textContent = c0 ? (c0.skipped ? 'Closed' : 'Remediated') : ''; } const hl = $('.halo', vt); if(hl){ if(c0) hl.setAttribute('aria-label', c0.skipped ? 'Case closed' : 'Remediated'); else hl.removeAttribute('aria-label'); } }
   const el = $('#remFoot'); if(!el) return; const open = 3 - remDone(), c = state.remClosed;
   el.innerHTML = c
-    ? `<span class="pill ok">Done</span><span class="caption">Marked done by ${esc(c.by)} · ${esc(c.at)}${c.skipped?` · ${c.skipped} action${c.skipped>1?'s':''} skipped`:''}</span><button type="button" class="linkbtn" id="remReopen">Reopen</button>`
-    : `<button type="button" class="btn solid" id="remDone">${icon('check')}Mark remediation done</button><span class="caption">${open ? `${open} action${open>1?'s':''} still recommended` : 'All actions taken'}</span>`;
+    ? `<span class="pill ok">Done</span><span class="caption">Marked done by ${esc(c.by)} · ${esc(c.at)}${c.skipped?` · ${c.skipped} action${c.skipped>1?'s':''} skipped`:''}</span><button type="button" class="linkbtn" id="remReopen" style="margin-left:auto">Reopen</button>`
+    : `<span class="caption" style="margin-right:auto">${open ? `${open} action${open>1?'s':''} still recommended` : 'All actions taken'}</span><button type="button" class="btn solid" id="remDone">${icon('check')}Mark remediation done</button>`;
 }
 function remFinish(reason){
   const open = 3 - remDone(), by = PEOPLE.lead.name;
@@ -2263,7 +2276,7 @@ document.addEventListener('click', e => {
 function renderNote(){
   const n = $('#personaNote'), v = state.view; n.hidden = false;
   n.classList.toggle('multi', v==='t2');
-  const st = (P, role, status) => `<div class="cstep"><span class="cav" style="background-image:url(${P.img})"></span><div><b>${esc(P.name)}</b><span class="s">${role} · ${esc(status[0].toUpperCase()+status.slice(1))}</span></div></div>`;
+  const st = (P, role, status) => `<div class="cstep"><span class="cav" style="background-image:url(${P.img})"></span><div><b>${esc(P.name)}</b><span class="s">${role} · <span class="stw ${({escalated:'amber',challenged:'amber',done:'green',confirmed:'green',approved:'green'})[status]||''}">${esc(status[0].toUpperCase()+status.slice(1))}</span></span></div></div>`;
   const sep = `<span class="csep">${icon('chev')}</span>`;
   const chain = me => `<div class="chain"><div class="cstep"><span class="cav ai">${icon('sparkle')}</span><div><b>7AI</b><span class="s">Malicious · escalated</span></div></div>${sep}${st(PEOPLE.t1,(me==='t1'?'You, ':'')+'Tier 1 Analyst',state.review==='challenged'?'escalated':state.review)}${sep}${st(PEOPLE.t2,(me==='t2'?'You, ':'')+'Tier 2 Analyst',state.t2)}${sep}${st(PEOPLE.lead,(me==='lead'?'You, ':'')+'SOC Leader',state.lead)}</div>`;
   const why = `<b>Why the ratings differ.</b> Sentinel rated this alert Low. 7AI found a malicious file and a malicious domain, so it concluded Malicious. <button type="button" class="linkbtn" data-jump="severity">View reasoning ›</button>`;
@@ -2285,7 +2298,7 @@ function updateStatus(){
   $('#flagText').textContent = ld==='disagreed' ? 'The leader disagreed with an analyst decision. The case is reopened for Tier 2.' : dis ? 'An analyst challenged 7AI on this case. It is under review.' : 'No analyst has disagreed with 7AI on this case.';
   let sub = 'Analyst review: pending', pill = null, cls = 'ok';
   if(ld==='disagreed'){ sub='Reopened by the leader'; pill='Reopened by leader'; cls='warn'; }
-  else if(t2==='escalated'){ sub='Escalated to the leader'; pill='With the leader'; cls='warn'; }
+  else if(t2==='escalated'){ sub='Escalated to the leader'; pill='With the leader'; cls='warn withlead'; }
   else if(t2==='confirmed'){ sub='Confirmed by Tier 2'; pill='Confirmed by Tier 2'; }
   else if(t2==='challenged'){ sub='Re-scan requested by Tier 2'; pill='Re-scan requested'; cls='warn'; }
   else if(t1==='challenged'){ sub='With Tier 2 Analyst'; pill='Under review by Tier 2'; cls='warn'; }
