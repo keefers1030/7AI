@@ -90,6 +90,9 @@ section[id]{scroll-margin-top:calc(var(--chrome-h,133px) + 24px)}
 .pill{display:inline-flex;align-items:center;height:18px;padding:0 8px;border-radius:var(--radius-full);font:700 10px/14px var(--font);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
 .pill.mal{background:var(--danger);color:var(--text-primary)}
 .pill.esc{padding:0;color:var(--danger-text)}
+.vesc{display:inline-flex;align-items:center;gap:4px;height:18px;font:700 10px/14px var(--font);letter-spacing:.06em;text-transform:uppercase;color:#9a5a00;white-space:nowrap}
+.vesc .i{width:12px;height:12px;stroke-width:2.5}
+#audit .audbody>.grow{flex:0 0 auto}
 .pill.low{background:#1d2127;color:#fff}
 .pill.ok{background:var(--success-soft);color:var(--success-text);border-radius:var(--radius-sm)}
 .pill.neutral{background:var(--neutral-chip);color:var(--text-primary)}
@@ -109,7 +112,7 @@ section[id]{scroll-margin-top:calc(var(--chrome-h,133px) + 24px)}
 #ovTable .pill.rv-need{color:var(--accent-ink)}
 #ovTable .pill.rv-dis{color:#2a6582}
 #ovTable .pill.rv-t2{color:var(--text-secondary)}
-.upg{cursor:help;display:inline-block;margin-left:6px;padding:0 3px;font-size:13px;font-weight:700;line-height:1;color:var(--danger-text)}
+.upg{position:relative;cursor:pointer;display:inline-block;margin-left:6px;padding:0 3px;font-size:13px;font-weight:700;line-height:1;color:#c26a00;white-space:nowrap}
 
 /* verdict zone */
 .verdict{display:flex;flex-direction:column;gap:24px}
@@ -399,6 +402,8 @@ tr.arow:hover td{background:#fafaff}
 .pnote{display:flex;gap:10px;align-items:flex-start;padding:12px 24px;border-top:1px solid var(--border);background:var(--surface-inset);font-size:13px}
 .pnote .i{width:18px;height:18px;color:var(--accent-ink);flex:none;margin-top:1px}
 .t1only,.t2only,.leadonly{display:none}
+#t2bar,#leadbar{border-top:0;padding:20px 24px}
+body[data-view="t2"] #t2bar,body[data-view="lead"] #leadbar{display:flex}
 body[data-view="t1"] .t1only,body[data-view="t2"] .t2only,body[data-view="lead"] .leadonly{display:block}
 body:not([data-view="t1"]) #goVerdict{display:none}
 .stubgroup .srow{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;border-top:1px solid var(--border)}
@@ -414,7 +419,9 @@ body:not([data-view="t1"]) #goVerdict{display:none}
 body[data-view="lead"] .leadfilters{display:flex}
 .fl{display:flex;align-items:center;gap:6px}
 .fl select{font:inherit;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface)}
-.t2only .btn[data-rescan]{height:28px;padding:0 12px;font-size:12px}
+.t1t2only{display:none}
+body[data-view="t1"] .t1t2only,body[data-view="t2"] .t1t2only{display:block}
+.t1t2only .btn[data-rescan]{height:28px;padding:0 12px;font-size:12px}
 @media (max-width:700px){.actgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* prototype control: outside the product UI, so it never reads as part of the site */
@@ -517,6 +524,9 @@ body[data-screen="list"] .lsub{display:flex}
 .dbar[data-state="confirmed"] .dsub,.dbar[data-state="challenged"] .dsub{display:none}
 .dsticky{position:fixed;right:24px;bottom:16px;z-index:65;display:flex;align-items:center;gap:8px;padding:8px 8px 8px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-full);box-shadow:0 8px 24px rgba(29,33,39,.16)}
 .dsticky[hidden]{display:none}
+.upg::after{content:attr(data-tip);position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--text-primary);color:#fff;font-size:12px;font-weight:500;line-height:1.3;padding:6px 10px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s;z-index:80}
+.upg:hover::after,.upg:focus-visible::after{opacity:1}
+.upg:focus-visible{outline:2px solid var(--accent-ink,#c26a00);outline-offset:2px;border-radius:4px}
 .dst{display:flex;align-items:center;gap:8px;margin-right:8px;font-size:13px}
 .dst .s{color:var(--text-secondary);font-size:12px}
 @media (max-width:900px){.dsticky{left:16px;right:16px;bottom:64px;border-radius:var(--radius-lg);flex-wrap:wrap}.dst .s{display:none}}
@@ -549,8 +559,17 @@ body[data-screen="list"] .lsub{display:flex}
 .remart{display:flex;flex-direction:column;gap:2px;padding:12px 16px;background:var(--surface-inset);border:1px solid var(--border);border-radius:var(--radius-md)}
 .remart .k{font-size:12px;line-height:16px;color:var(--text-secondary)}
 .remart .v{font-size:13px;line-height:20px}
+.remfoot{display:none;align-items:center;gap:12px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+body[data-view="lead"] .remfoot{display:flex}
 .remact{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid var(--border)}
 .remact b{font-size:13px;line-height:20px;font-weight:600}
+
+/* remediation: approve and run */
+.remctl{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.remctl .caption{font-size:12px}
+.remctl .spin{width:14px;height:14px;flex:none;border-radius:50%;border:2px solid rgba(109,95,193,.25);border-top-color:var(--accent);animation:m-spin .8s linear infinite}
+.remact.running{background:linear-gradient(90deg,transparent,rgba(109,95,193,.07),transparent);background-size:200% 100%;animation:m-shimmer 1.6s linear infinite}
+.remact.done b{color:var(--success-text)}
 /* round 7: main CTAs match 7AI's dark rounded-rectangle buttons */
 .btn.primary,.btn.solid{background:#262c31;border:1px solid #262c31;color:#fff;box-shadow:0 1px 2px rgba(29,33,39,.16);font-weight:600}
 .btn.primary:hover,.btn.solid:hover{background:#3a4148;border-color:#3a4148}
@@ -839,7 +858,7 @@ body.boot #colL>*:nth-child(4),body.boot #colR>*:nth-child(4){animation-delay:.6
         <div style="min-width:0">
         <div class="eyebrow">Microsoft Sentinel alert for ransomware was prevented</div>
         <h1 class="vtitle2">‘Black Basta’ ransomware was prevented on <span style="white-space:nowrap">JACKSON-LAPTOP-7334</span></h1>
-        <div class="vmeta"><span class="pill mal">Malicious</span><span class="pill neutral">Escalated</span><span class="pill ok" id="reviewPill" hidden></span><span class="pill pill-live">Investigating</span></div>
+        <div class="vmeta"><span class="pill mal">Malicious</span><span class="vesc"><svg class="i" aria-hidden="true"><use href="#i-escal"/></svg>Escalated</span><span class="pill ok" id="reviewPill" hidden></span><span class="pill pill-live">Investigating</span></div>
         </div>
       </div>
       <div class="vtime" title="7AI received the alert at 11:06:31 AM and reached a conclusion at 11:07:09 AM"><b>Completed in 38 seconds</b><span>Dec 2, 2024 · 11:06:31–11:07:09 AM</span></div>
@@ -866,7 +885,7 @@ body.boot #colL>*:nth-child(4),body.boot #colR>*:nth-child(4){animation-delay:.6
           <div><svg class="i" aria-hidden="true"><use href="#i-shield"/></svg><div><b>Source reported:</b><span class="t">ransomware prevented</span></div></div>
           <div><i class="dotred" aria-hidden="true"></i><div><b>7AI observed:</b><span class="t">malicious file execution</span></div></div>
         </div>
-        <div class="caption">Remediation: 3 recommended actions, none taken yet. <a class="linkbtn" href="#remediation">View remediation ›</a></div>
+        <div class="caption"><span class="remcap">Remediation: 3 recommended actions, none taken yet.</span> <a class="linkbtn" href="#remediation">View remediation ›</a></div>
         <div class="review">
           <button class="btn primary" data-act="confirm">Confirm conclusion</button>
           <button class="btn secondary" data-act="challenge">Challenge conclusion…</button>
@@ -884,15 +903,19 @@ body.boot #colL>*:nth-child(4),body.boot #colR>*:nth-child(4){animation-delay:.6
         <div class="agents" id="steps"></div>
       </div>
 
-      <div class="card t2only" id="t2bar">
-        <h2 class="cardtitle" style="font-size:18px">Next step</h2>
-        <div class="caption" style="margin:4px 0 16px">Remediation: 3 recommended actions, none taken yet.</div>
-        <div class="review">
-          <button type="button" class="btn primary" id="t2Challenge">Challenge and re-scan</button>
-          <button type="button" class="btn solid" id="t2Confirm">Confirm 7AI’s action</button>
-          <button type="button" class="btn solid" id="t2Escalate">Escalate to leader</button>
+      <div class="card dbar t2only" id="t2bar">
+        <span class="cav ai" style="margin-right:-8px" aria-hidden="true"><svg class="i"><use href="#i-sparkle"/></svg></span>
+        <div class="dmain">
+          <h2 class="dtitle" id="t2barTitle">Approval</h2>
+          <p class="dsub">Confirm 7AI’s action, or escalate this case to the SOC leader.</p>
+          <div class="caption"><span class="remcap">Remediation: 3 recommended actions, none taken yet.</span></div>
+          <button type="button" class="linkbtn" id="t2Challenge" style="margin-top:8px;align-self:flex-start">Challenge and re-scan ›</button>
+          <div class="caption" id="t2Status" style="margin-top:8px"></div>
         </div>
-        <div class="caption" id="t2Status" style="margin-top:12px"></div>
+        <div class="dacts" role="group" aria-labelledby="t2barTitle">
+          <button type="button" class="btn solid" id="t2Confirm"><svg class="i"><use href="#i-check"/></svg>Confirm</button>
+          <button type="button" class="btn solid" id="t2Escalate"><svg class="i"><use href="#i-escal"/></svg>Escalate</button>
+        </div>
       </div>
       <div class="card" id="oversight">
         <div class="rhead"><div><h2 class="pagetitle">Investigations</h2><div class="caption" style="margin-top:4px">What your team decided, and why. Sample data, except the Black Basta case.</div></div><button type="button" class="btn secondary" id="lExport"><svg class="i"><use href="#i-download"/></svg>Export list</button></div>
@@ -913,13 +936,17 @@ body.boot #colL>*:nth-child(4),body.boot #colR>*:nth-child(4){animation-delay:.6
         <dl class="kv" style="margin:12px 0 0"><dt>Tools run</dt><dd>5 (3 EDR, 2 Device)</dd><dt>Not stated</dt><dd>IP reputation result</dd><dt>Reviewed by</dt><dd id="reviewedBy">Nobody yet</dd></dl>
       </div>
       <div class="card leadonly" id="flag">
-        <h2 class="cardtitle" style="font-size:18px">Analyst disagreement</h2>
+        <h2 class="cardtitle" style="font-size:18px">Challenged by Analyst</h2>
         <p class="caption" id="flagText" style="margin-top:8px"></p>
       </div>
-      <div class="card leadonly" id="leadbar">
-        <h2 class="cardtitle" style="font-size:18px">Next step</h2>
-        <div class="caption" style="margin:4px 0 16px">Record whether you agree with the latest analyst decision.</div>
-        <div class="review"><button type="button" class="btn primary" id="btnReviewDecision">Review decision</button><button type="button" class="btn secondary" id="btnDownload2">Download report</button></div>
+      <div class="card dbar leadonly" id="leadbar">
+        <div class="dmain">
+          <h2 class="dtitle" id="leadbarTitle">Approval</h2>
+          <p class="dsub">Record whether you agree with the latest analyst decision.</p>
+        </div>
+        <div class="dacts" role="group" aria-labelledby="leadbarTitle">
+          <button type="button" class="btn solid" id="btnReviewDecision"><svg class="i"><use href="#i-check"/></svg>Review decision</button>
+        </div>
       </div>
 
     </div>
@@ -960,23 +987,24 @@ body.boot #colL>*:nth-child(4),body.boot #colR>*:nth-child(4){animation-delay:.6
 <section id="remediation" aria-label="Remediation">
   <div class="card">
     <div class="sechead">
-      <div><h2 class="pagetitle">Remediation</h2><div class="caption" style="margin-top:4px">Actions to take and recommendations to implement. None have been taken yet.</div></div>
+      <div><h2 class="pagetitle">Remediation</h2><div class="caption" style="margin-top:4px" id="remHead">Actions to take and recommendations to implement. None have been taken yet.</div></div>
       <button type="button" class="linkbtn" id="remAudit">View audit log ›</button>
     </div>
     <div class="remlist">
       <div class="remi"><div class="remh"><span class="rico"><svg class="i" aria-hidden="true"><use href="#i-bolt"/></svg></span><h3>Device Remediation Agent</h3></div>
         <div class="remb"><div class="remart"><span class="k">Device</span><span class="v mono">JACKSON-LAPTOP-7334</span></div>
         <p>A file with a malicious reputation ran on this device, and the device connected to a malicious domain. Isolating it keeps anything left behind from reaching other devices while it is checked.</p>
-        <div class="remact"><b>Isolate device</b><span class="pill neutral">Recommended</span></div></div></div>
+        <div class="remact" data-rem="isolate"><b>Isolate device</b><span class="remctl"></span></div></div></div>
       <div class="remi"><div class="remh"><span class="rico"><svg class="i" aria-hidden="true"><use href="#i-bolt"/></svg></span><h3>File Remediation Agent</h3></div>
         <div class="remb"><div class="remart"><span class="k">File</span><span class="v">Malicious file <span class="caption">(SHA-256 not recorded in the report)</span></span></div>
         <p>Sentinel stopped the ransomware on this device. Blocking the file across the organization stops it from running anywhere else.</p>
-        <div class="remact"><b>Block file hash</b><span class="pill neutral">Recommended</span></div></div></div>
+        <div class="remact" data-rem="hash"><b>Block file hash</b><span class="remctl"></span></div></div></div>
       <div class="remi"><div class="remh"><span class="rico"><svg class="i" aria-hidden="true"><use href="#i-bolt"/></svg></span><h3>Domain Remediation Agent</h3></div>
         <div class="remb"><div class="remart"><span class="k">Domain</span><span class="v mono">moereng.com</span></div>
         <p>The device connected to this known malicious domain. Blocking it at the network edge stops other devices from reaching it.</p>
-        <div class="remact"><b>Block domain</b><span class="pill neutral">Recommended</span></div></div></div>
+        <div class="remact" data-rem="domain"><b>Block domain</b><span class="remctl"></span></div></div></div>
     </div>
+    <div class="remfoot leadonly" id="remFoot"></div>
   </div>
 </section>
 
@@ -1010,11 +1038,11 @@ body.boot #colL>*:nth-child(4),body.boot #colR>*:nth-child(4){animation-delay:.6
     </div>
     <div class="leadonly leadfilters">
       <label class="caption fl">By analyst <select id="fWho"><option value="all">All</option><option>7AI</option><option>Tier 1</option><option>Tier 2</option><option>SOC leader</option></select></label>
-      <label class="caption fl">By outcome <select id="fKind"><option value="all">All</option><option value="ai">7AI steps</option><option value="decision">Decisions</option><option value="review">Reviews</option></select></label>
+      <label class="caption fl">By outcome <select id="fKind"><option value="all">All</option><option value="ai">7AI steps</option><option value="decision">Decisions</option><option value="review">Reviews</option><option value="action">Actions</option></select></label>
     </div>
-    <div class="row" style="gap:32px;align-items:flex-start">
+    <div class="audbody" style="display:flex;flex-direction:column;gap:24px">
       <div class="grow"><div class="timeline" id="timelineInline" aria-label="Audit timeline"></div><div id="auditMore"></div></div>
-      <div class="inset" style="flex:0 1 460px;min-width:280px;display:flex;flex-direction:column;gap:12px">
+      <div class="inset" style="display:flex;flex-direction:column;gap:12px">
         <span class="label">Analyst review</span>
         <div id="reviewStatus"><b>Pending.</b> No analyst has confirmed or challenged this conclusion yet.</div>
         <div class="caption" id="reviewChain"></div>
@@ -1126,7 +1154,7 @@ function renderSteps(){
       <div class="tool" id="${t.id}">
         <button class="trow acc-btn" aria-expanded="false" aria-controls="${t.id}-d"><span class="tname">${esc(s.name)} ran <b style="font-weight:600">${t.name}</b></span>${toolPill(t)}${icon('chev','chev')}</button>
         <div class="tdetail" id="${t.id}-d" hidden>
-          <div><div class="lab">Result</div><div>${esc(t.text)}</div><div style="margin-top:8px">${outcomePill(t.outcome)}</div><div class="t2only" style="margin-top:12px"><button type="button" class="btn secondary" data-rescan="${t.name}">Re-scan</button></div></div>
+          <div><div class="lab">Result</div><div>${esc(t.text)}</div><div style="margin-top:8px">${outcomePill(t.outcome)}</div><div class="t1t2only" style="margin-top:12px"><button type="button" class="btn secondary" data-rescan="${t.name}">Re-scan</button></div></div>
           <div><div class="lab">Request and response</div>${t.response
             ? `<div class="caption">Tool <span class="mono">${t.name}</span> · input <span class="mono">${esc(t.input)}</span></div><pre class="code">${esc(t.response)}</pre><div class="caption" style="margin-top:4px"><span class="pill neutral" style="margin-right:6px">Illustrative sample</span>The source response is not recorded in this report.</div>`
             : `<div class="muted">Not provided in the report</div>`}</div>
@@ -1228,6 +1256,78 @@ function challengeVerdict(){
 document.addEventListener('click', e => { const a=e.target.closest('[data-act]'); if(!a) return; if(a.dataset.act==='confirm') confirmVerdict(); else challengeVerdict(); });
 $('#goVerdict').addEventListener('click', () => goTo($('#decide')));
 
+
+/* ---------- remediation: the agent can run these, a person approves ---------- */
+const REM = {
+  isolate:{ label:'Isolate device', undo:'Release device', agent:'Device Remediation Agent', who:['lead'], need:'Needs SOC leader approval',
+    impact:'This takes JACKSON-LAPTOP-7334 off the network, so jackson.miller will lose access on it until it is released. You can release the device at any time.' },
+  hash:{ label:'Block file hash', undo:'Unblock hash', agent:'File Remediation Agent', who:['t2','lead'], need:'Tier 2 or the SOC leader approves',
+    impact:'This blocks the malicious file across the organization so it cannot run on any device. You can unblock it later.' },
+  domain:{ label:'Block domain', undo:'Unblock domain', agent:'Domain Remediation Agent', who:['t2','lead'], need:'Tier 2 or the SOC leader approves',
+    impact:'This blocks moereng.com at the network edge for every device. You can unblock it later.' }
+};
+state.rem = { isolate:{s:'rec'}, hash:{s:'rec'}, domain:{s:'rec'} }; state.remClosed = null;
+const remDone = () => Object.values(state.rem).filter(r => r.s==='done').length;
+function remSummary(){ const n=remDone(); return n ? `${n} of 3 actions taken · ${3-n} still recommended` : '3 recommended actions · none taken yet'; }
+function updRem(){
+  $$('.remact[data-rem]').forEach(row => {
+    const k=row.dataset.rem, d=REM[k], r=state.rem[k], ok=d.who.includes(state.view), ctl=$('.remctl',row);
+    row.classList.toggle('running', r.s==='running'); row.classList.toggle('done', r.s==='done');
+    let h='';
+    if(r.s==='rec'){ h = (r.undone?`<span class="pill neutral">Undone</span>`:`<span class="pill neutral">Recommended</span>`) + (ok ? `<button type="button" class="btn solid" data-remrun="${k}">Approve and run</button>` : `<span class="caption">${d.need}</span>`); }
+    else if(r.s==='running'){ h = `<span class="spin" aria-hidden="true"></span><span class="caption">${d.agent} is running this…</span>`; }
+    else { h = `<span class="pill ok">Done</span><span class="caption">${esc(r.by)} approved · ${esc(r.at)}</span>` + (ok ? `<button type="button" class="linkbtn" data-remundo="${k}">Undo: ${d.undo}</button>` : ''); }
+    ctl.innerHTML=h;
+  });
+  const n=remDone(), hd=$('#remHead'); if(hd) hd.textContent = n ? `${n} of 3 actions taken. Each one is approved by a person and recorded in the audit log.` : 'Actions to take and recommendations to implement. None have been taken yet.';
+  updRemFoot();
+  $$('.remcap').forEach(e => e.textContent = n ? `Remediation: ${n} of 3 actions taken, ${3-n} still recommended.` : 'Remediation: 3 recommended actions, none taken yet.');
+}
+function remRun(k){
+  const d=REM[k];
+  openDialog({ title:`Approve: ${d.label}`, ok:'Approve and run',
+    body:`<p style="margin:0 0 12px">${d.impact}</p><p class="caption" style="margin:0">${d.agent} runs it right away. The action is recorded in the audit log under your name.</p>`,
+    onOk(){
+      state.rem[k]={s:'running'}; updRem();
+      setTimeout(() => {
+        state.rem[k]={s:'done', by:PEOPLE[state.view].name, at:nowTime()}; updRem();
+        logEvent(`Remediation: ${d.label} run by ${d.agent}, approved by ${PEOPLE[state.view].name}`, true, 'action');
+        toast(`${d.label}: done`); if(typeof refreshBars==='function') refreshBars();
+      }, RM()?300:1600);
+    } });
+}
+function remUndo(k){
+  const d=REM[k];
+  openDialog({ title:`Undo: ${d.undo}`, ok:d.undo,
+    body:`<p style="margin:0">${d.agent} will reverse this action. The undo is recorded in the audit log under your name.</p>`,
+    onOk(){ state.rem[k]={s:'rec', undone:true}; updRem(); logEvent(`Remediation undone: ${d.undo} by ${PEOPLE[state.view].name}`, false, 'action'); toast(`${d.undo}: done`); if(typeof refreshBars==='function') refreshBars(); } });
+}
+document.addEventListener('click', e => { const a=e.target.closest('[data-remrun]'); if(a) remRun(a.dataset.remrun); const u=e.target.closest('[data-remundo]'); if(u) remUndo(u.dataset.remundo); });
+updRem();
+
+function updRemFoot(){
+  const el = $('#remFoot'); if(!el) return; const open = 3 - remDone(), c = state.remClosed;
+  el.innerHTML = c
+    ? `<span class="pill ok">Done</span><span class="caption">Marked done by ${esc(c.by)} · ${esc(c.at)}${c.skipped?` · ${c.skipped} action${c.skipped>1?'s':''} skipped`:''}</span><button type="button" class="linkbtn" id="remReopen">Reopen</button>`
+    : `<button type="button" class="btn solid" id="remDone">${icon('check')}Mark remediation done</button><span class="caption">${open ? `${open} action${open>1?'s':''} still recommended` : 'All actions taken'}</span>`;
+}
+function remFinish(reason){
+  const open = 3 - remDone(), by = PEOPLE.lead.name;
+  state.remClosed = {by, at:nowTime(), skipped:open, reason:reason||''}; if(state.lead!=='disagreed') state.lead = 'done';
+  logEvent(`Remediation marked done by ${by}${open?` with ${open} action${open>1?'s':''} skipped: “${(reason||'').slice(0,100)}”`:''}`, true, 'action');
+  updRem(); updateStatus(); toast('Remediation marked done');
+}
+document.addEventListener('click', e => {
+  if(e.target.closest('#remDone')){
+    const open = 3 - remDone();
+    if(!open) remFinish('');
+    else reasonDialog({ title:'Mark remediation done', label:`${open} action${open>1?'s are':' is'} still recommended. Why mark it done anyway? (required)`, ok:'Mark done', required:true, err:'Add a reason so the audit log shows why it was skipped.', onSave:v => remFinish(v) });
+  }
+  if(e.target.closest('#remReopen')){
+    state.remClosed = null; if(state.lead==='done') state.lead = 'pending';
+    logEvent(`Remediation reopened by ${PEOPLE.lead.name}`, true, 'action'); updRem(); updateStatus(); toast('Remediation reopened');
+  }
+});
 /* ---------- drawer, menu ---------- */
 const drawer=$('#drawer');
 function openHistory(){ $('#histDot').hidden=true; drawer.showModal(); }
@@ -1468,14 +1568,15 @@ const VIEWS = {
 };
 /* slots: top (full width), L and R (the two columns), bottom (full width). "optional" blocks start collapsed into the "More detail" list. */
 const LAYOUT = {
-  t1:  { top:[], L:['conclusion','report'], R:['kfCard','oa','limit'], bottom:['remediation','audit','artifacts'], optional:[] },
-  t2:  { top:[], L:['conclusion','report'], R:['kfCard','limit','oa'], bottom:['remediation','t2bar','audit','artifacts'], optional:[] },
-  lead:{ top:[], L:['conclusion','report'], R:['checked','flag','kfCard','limit','oa'], bottom:['remediation','leadbar','audit','artifacts'], optional:[] }
+  t1:  { top:[], L:['conclusion','report'], R:['kfCard','oa','limit'], L2:['remediation'], R2:['audit'], bottom:['artifacts'], optional:[] },
+  t2:  { top:['t2bar'], L:['conclusion','report'], R:['kfCard','limit','oa'], L2:['remediation'], R2:['audit'], bottom:['artifacts'], optional:[] },
+  lead:{ top:['leadbar'], L:['conclusion','report'], R:['checked','flag','kfCard','limit','oa'], L2:['remediation'], R2:['audit'], bottom:['artifacts'], optional:[] }
 };
+let nextStickyFn = () => {};
 const ALL = ['conclusion','decide','report','remediation','t2bar','oversight','checked','flag','leadbar','kfCard','oa','limit','audit','artifacts'];
 const STUB = {
   report:['Agentic investigation report', () => '2 agents · 5 tools · 1 result not stated'],
-  remediation:['Remediation', () => '3 recommended actions · none taken yet'],
+  remediation:['Remediation', () => remSummary()],
   artifacts:['Artifact discovery', () => '4 artifacts · 2 malicious'],
   audit:['Audit and review', () => `${state.history.length} events · last: ${state.history[state.history.length-1].text.slice(0,44)}`],
   oa:['Original alert', () => 'Microsoft Sentinel · severity Low'],
@@ -1491,8 +1592,8 @@ function buildLayout(){
   // Tier 1's Decide panel takes the buttons that used to sit inside the conclusion card
   $('#conclusion .review').remove(); $('#conclusion .t1only').remove();
   const decide = document.createElement('div'); decide.id='decide'; decide.className='dbar'; decide.dataset.state='pending';
-  decide.innerHTML = `<div class="dmain">
-      <h2 class="dtitle" id="decideTitle">Your decision</h2>
+  decide.innerHTML = `<span class="cav ai" style="margin-right:-8px" aria-hidden="true">${icon('sparkle')}</span><div class="dmain">
+      <h2 class="dtitle" id="decideTitle">Approval</h2>
       <p class="dsub">7AI escalated this alert to you. Confirm its conclusion, or escalate it to a Tier 2 Analyst with a reason.</p>
       <a class="dprog" href="#kfCard" data-reviewlink><span class="segs" aria-hidden="true"><i></i><i></i><i></i></span><span>Findings reviewed: <span data-reviewed>${state.reviewed.size}</span> of 3</span></a>
     </div>
@@ -1502,13 +1603,28 @@ function buildLayout(){
     </div>
     <div class="ddone" id="decideDone" hidden></div>`;
   hold.appendChild(decide);
-  const sticky = document.createElement('div'); sticky.id='decideSticky'; sticky.className='dsticky'; sticky.hidden = true; sticky.setAttribute('role','region'); sticky.setAttribute('aria-label','Your decision');
+  const sticky = document.createElement('div'); sticky.id='decideSticky'; sticky.className='dsticky'; sticky.hidden = true; sticky.setAttribute('role','region'); sticky.setAttribute('aria-label','Approval');
   sticky.innerHTML = `<span class="dst"><i class="dotred" aria-hidden="true"></i><b>7AI concluded: Malicious</b><span class="s">Findings reviewed: <span data-reviewed>${state.reviewed.size}</span> of 3</span></span><button type="button" class="btn solid" data-act="confirm">${icon('check')}Confirm</button><button type="button" class="btn solid" data-act="challenge">${icon('escal')}Escalate</button>`;
   document.body.appendChild(sticky);
+  const nx = document.createElement('div'); nx.id='nextSticky'; nx.className='dsticky'; nx.hidden = true; nx.setAttribute('role','region'); nx.setAttribute('aria-label','Approval'); document.body.appendChild(nx);
+  const nxSeen = {t2bar:true, leadbar:true}; let nxFor = '';
+  nextStickyFn = () => {
+    const v = state.view, id = v==='t2' ? 't2bar' : 'leadbar';
+    const pending = v==='t2' ? state.t2==='pending' : v==='lead' ? state.lead==='pending' : false;
+    const show = pending && state.screen==='case' && !nxSeen[id] && !state.live && !state.replaying;
+    if(show && nxFor!==v){ nxFor = v; nx.innerHTML = v==='t2'
+      ? `<span class="dst"><i class="dotred" aria-hidden="true"></i><b>Approval</b><span class="s">Tier 2</span></span><button type="button" class="btn solid" data-proxy="t2Confirm">${icon('check')}Confirm</button><button type="button" class="btn solid" data-proxy="t2Escalate">${icon('escal')}Escalate</button>`
+      : `<span class="dst"><i class="dotred" aria-hidden="true"></i><b>Approval</b><span class="s">SOC leader</span></span><button type="button" class="btn solid" data-proxy="btnReviewDecision">${icon('check')}Review decision</button>`; }
+    if(!show) nxFor = '';
+    nx.hidden = !show;
+  };
+  nx.addEventListener('click', e => { const b = e.target.closest('[data-proxy]'); if(b) $('#'+b.dataset.proxy).click(); });
+  ['t2bar','leadbar'].forEach(id => new IntersectionObserver(es => { es.forEach(en => { nxSeen[id] = en.isIntersecting; nextStickyFn(); }); }, {rootMargin:'-140px 0px 0px 0px'}).observe($('#'+id)));
   new IntersectionObserver(es => { es.forEach(en => { decideVisible = en.isIntersecting; updDecide(); }); }, {rootMargin:'-140px 0px 0px 0px'}).observe(decide);
   const mk = (id, cls) => { const e = document.createElement('div'); e.id = id; if(cls) e.className = cls; return e; };
   const grid = mk('vgrid','sgrid'); grid.append(mk('colL','scol'), mk('colR','scol'));
-  sum.append(mk('slotTop','vstack'), grid, mk('slotBottom','vstack'));
+  const grid2 = mk('vgrid2','sgrid'); grid2.append(mk('colL2','scol'), mk('colR2','scol'));
+  sum.append(mk('slotTop','vstack'), grid, grid2, mk('slotBottom','vstack'));
   const ml = mk('moreLabel','label'); ml.textContent = 'More detail'; hold.appendChild(ml);
   const back = document.createElement('button'); back.type='button'; back.className='linkbtn backlink'; back.id='backList'; back.textContent='‹ All investigations'; sum.prepend(back);
 }
@@ -1529,15 +1645,15 @@ function layoutInner(){
   const S = LAYOUT[state.view], hold = $('#vhold');
   ALL.forEach(id => hold.appendChild($('#'+id))); Object.values(OG).forEach(g => hold.appendChild(g)); hold.appendChild($('#moreLabel'));
   applyScreen();
-  if(state.view==='lead' && state.screen==='list'){ $('#slotBottom').appendChild($('#oversight')); $('#vgrid').hidden = true; renderOversight(); return; }
+  if(state.view==='lead' && state.screen==='list'){ $('#slotBottom').appendChild($('#oversight')); $('#vgrid').hidden = true; $('#vgrid2').hidden = true; renderOversight(); return; }
   const vz = $('#verdictZone'), pn = $('#personaNote');
   if(state.view==='t1' || state.view==='t2') $('#reasoning').after(pn); else $('.sigrow', vz).before(pn);
   if(state.view==='t1') vz.appendChild($('#decide'));
-  const slots = { top:$('#slotTop'), L:$('#colL'), R:$('#colR'), bottom:$('#slotBottom') };
-  ['top','L','R','bottom'].forEach(k => { let labelled = false; S[k].forEach(id => {
+  const slots = { top:$('#slotTop'), L:$('#colL'), R:$('#colR'), L2:$('#colL2'), R2:$('#colR2'), bottom:$('#slotBottom') };
+  ['top','L','R','L2','R2','bottom'].forEach(k => { let labelled = false; S[k].forEach(id => {
     if(S.optional.includes(id)){ if(!labelled){ slots[k].appendChild($('#moreLabel')); labelled = true; } const g = ogroup(id); slots[k].appendChild(g); if(state.open.has(id)) g.appendChild($('#'+id)); }
     else slots[k].appendChild($('#'+id)); }); });
-  refreshBars(); $('#vgrid').hidden = !S.L.length && !S.R.length; fitMap();
+  refreshBars(); nextStickyFn(); $('#vgrid').hidden = !S.L.length && !S.R.length; $('#vgrid2').hidden = !(S.L2||[]).length && !(S.R2||[]).length; fitMap();
 }
 function toggleSection(id){
   const bar = OG[id] && OG[id].firstChild, before = bar ? bar.getBoundingClientRect().top : 0;
@@ -1556,15 +1672,16 @@ document.addEventListener('click', e => {
 function renderNote(){
   const n = $('#personaNote'), v = state.view; n.hidden = false;
   n.classList.toggle('multi', v==='t2');
+  const st = (P, role, status) => `<div class="cstep"><span class="cav" style="background-image:url(${P.img})"></span><div><b>${esc(P.name)}</b><span class="s">${role} · ${esc(status[0].toUpperCase()+status.slice(1))}</span></div></div>`;
+  const sep = `<span class="csep">${icon('chev')}</span>`;
+  const chain = me => `<div class="chain"><div class="cstep"><span class="cav ai">${icon('sparkle')}</span><div><b>7AI</b><span class="s">Malicious · escalated</span></div></div>${sep}${st(PEOPLE.t1,(me==='t1'?'You, ':'')+'Tier 1 Analyst',state.review==='challenged'?'escalated':state.review)}${sep}${st(PEOPLE.t2,(me==='t2'?'You, ':'')+'Tier 2 Analyst',state.t2)}${sep}${st(PEOPLE.lead,(me==='lead'?'You, ':'')+'SOC Leader',state.lead)}</div>`;
   const why = `<b>Why the ratings differ.</b> Sentinel rated this alert Low. 7AI found a malicious file and a malicious domain, so it concluded Malicious. <button type="button" class="linkbtn" data-jump="severity">View reasoning ›</button>`;
   if(v==='t1') n.innerHTML = `${icon('info')}<div>${why}</div>`;
   else if(v==='t2'){
     const who = state.lead==='disagreed' ? `<b>Reopened by the leader.</b> “${esc(state.leadNote)}”.` : (()=>{ const e = escEff(); return e ? `<b>Escalated by 7AI.</b> Tier 1 Analyst reviewed it and sent it to Tier 2${e.t?' at '+esc(e.t.replace(/:\d\d (AM|PM)/,' $1')):''}: “${esc(e.reason)}”` : `<b>Escalated by 7AI.</b> Analyst review: pending.`; })();
     n.innerHTML = `<div class="pn esc">${icon('escal')}<div>${who}${(state.lead==='disagreed'||escEff())?' Assigned to you.':''}</div></div><div class="pn">${icon('info')}<div>${why}</div></div>`;
   } else {
-    const st = (P, role, status) => `<div class="cstep"><span class="cav" style="background-image:url(${P.img})"></span><div><b>${esc(P.name)}</b><span class="s">${role} · ${esc(status[0].toUpperCase()+status.slice(1))}</span></div></div>`;
-    const sep = `<span class="csep">${icon('chev')}</span>`;
-    n.innerHTML = `<div class="chain"><div class="cstep"><span class="cav ai">${icon('sparkle')}</span><div><b>7AI</b><span class="s">Malicious · escalated</span></div></div>${sep}${st(PEOPLE.t1,'Tier 1 Analyst',state.review==='challenged'?'escalated':state.review)}${sep}${st(PEOPLE.t2,'Tier 2 Analyst',state.t2)}${sep}${st(PEOPLE.lead,'You, SOC Leader',state.lead)}<button type="button" class="btn primary" data-review style="margin-left:auto">Review decision</button></div>`;
+    n.innerHTML = chain('lead');
   }
 }
 function updateStatus(){
@@ -1586,7 +1703,7 @@ function updateStatus(){
   $('#sigReview').textContent = sub; const p = $('#reviewPill'); if(pill){ p.hidden=false; p.className='pill '+cls; p.textContent=pill; } else p.hidden = true;
   $('#t2Status').textContent = {pending:'Your status: pending.', confirmed:'You confirmed 7AI’s action. Your note went to Tier 1.', challenged:'You asked for a re-scan.', escalated:'You escalated this to the leader.'}[t2];
   renderNote(); renderOversight();
-  refreshBars();
+  refreshBars(); nextStickyFn();
 }
 function applyPerson(){
   const P = PEOPLE[state.view], t = $('.tenant'), sp = t.querySelectorAll('span');
@@ -1597,14 +1714,13 @@ function setView(v, o = {}){
   $$('#protoDock button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view===v)));
   closeReasoning();
   if(v==='t2') $('#btnExpandAll').click(); else { $('#btnCollapseAll').click(); setExpanded($('#t-domain .trow'),true); setExpanded($('#stephead-edr'),true); }
-  if(!document.body.classList.contains('boot')) play($('.page'),'vswap'); state.auditAll = false; applyPerson(); layout(); renderTimeline(); updateStatus(); forced = null; window.scrollTo({top:0, behavior:'instant'}); spy(); updDecide(); if(o.push!==false) navPush();
+  if(!document.body.classList.contains('boot')) play($('.page'),'vswap'); state.auditAll = false; applyPerson(); layout(); renderTimeline(); updRem(); updateStatus(); forced = null; window.scrollTo({top:0, behavior:'instant'}); spy(); updDecide(); if(o.push!==false) navPush();
 }
 window.setPersonaView = setView;
 window.addEventListener('message', e => { if(e.data && e.data.type==='persona-view' && VIEWS[e.data.view]) setView(e.data.view); });
 if(window.top !== window) document.body.classList.add('embedded');
 $$('#protoDock button').forEach(b => { $('.dkav',b).src = PEOPLE[b.dataset.view].img; b.addEventListener('click', () => setView(b.dataset.view)); });
 $('#fWho').addEventListener('change', e => { state.f.who = e.target.value; renderTimeline(); }); $('#fKind').addEventListener('change', e => { state.f.kind = e.target.value; renderTimeline(); });
-$('#btnDownload2').addEventListener('click', () => $('#miDownload').click());
 
 function reasonDialog(o){ openDialog({ title:o.title, ok:o.ok, body:`<label class="caption" for="dlgText">${o.label}</label><textarea class="field" id="dlgText" style="margin-top:6px"></textarea><div class="err" id="dlgErr" hidden></div>`,
   onOk(){ const v = $('#dlgText').value.trim(); if(o.required && !v){ const e = $('#dlgErr'); e.hidden=false; e.textContent = o.err||'Add a reason first.'; $('#dlgText').focus(); return false; } o.onSave(v); } }); }
@@ -1614,10 +1730,23 @@ $('#t2Escalate').addEventListener('click', () => reasonDialog({ title:'Escalate 
 document.addEventListener('click', e => { const r = e.target.closest('[data-rescan]'); if(r){ logEvent(`Re-scan requested: ${r.dataset.rescan}`, false, 'note'); toast('Re-scan requested for '+r.dataset.rescan); const tl=r.closest('.tool'); if(tl && !RM()){ tl.classList.add('working'); setTimeout(()=>{ tl.classList.remove('working'); flash(tl); },2000); } } });
 $('#btnReviewDecision').addEventListener('click', () => {
   const last = [...state.history].reverse().find(h => h.kind==='decision');
-  openDialog({ title:'Review decision', ok:'Save review',
-    body:`<p class="caption" style="margin:0 0 12px">${last?`Reviewing: ${esc(last.who||'')} · ${esc(last.text)}`:'No analyst decision yet. You can still record a review.'}</p><div class="seg" role="group" aria-label="Your review" id="revSeg" style="margin-bottom:12px"><button type="button" data-r="approved" aria-pressed="true">Approve</button><button type="button" data-r="disagreed" aria-pressed="false">Disagree</button></div><label class="caption" for="dlgText">Note (required if you disagree)</label><textarea class="field" id="dlgText" style="margin-top:6px"></textarea><div class="err" id="dlgErr" hidden></div>`,
-    onOk(){ const r = $('#revSeg button[aria-pressed="true"]').dataset.r, v = $('#dlgText').value.trim(); if(r==='disagreed' && !v){ const e = $('#dlgErr'); e.hidden=false; e.textContent='Say why you disagree.'; $('#dlgText').focus(); return false; } state.lead = r; if(r==='disagreed') state.leadNote = v; logEvent(`Reviewed the latest decision: ${r}${v?`. “${v.slice(0,100)}”`:''}`, true, 'review'); updateStatus(); toast(r==='approved'?'Approved. Review saved':'Case reopened for Tier 2'); } });
-  const seg = $('#revSeg'); seg.addEventListener('click', e => { const b = e.target.closest('button'); if(!b) return; $$('button',seg).forEach(x => x.setAttribute('aria-pressed', String(x===b))); });
+  openDialog({ title:'Review decision', focus:'#rvTake',
+    body:`<p class="caption" style="margin:0 0 12px">${last?`Latest decision: ${esc(last.who||'')} · ${esc(last.text)}`:'No analyst decision yet.'}</p>
+      <div class="caption" style="margin-bottom:6px">Audit log</div>
+      <div id="rvLog" style="max-height:240px;overflow:auto;border:1px solid var(--border);border-radius:var(--radius-md);padding:12px">${$('#timelineDrawer').innerHTML}</div>
+      <div class="dlgfoot" id="rvActs" style="justify-content:flex-start"><button type="button" class="btn solid" id="rvTake">${icon('check')}Take action</button><button type="button" class="btn solid" id="rvReturn">${icon('escal')}Return to Tier 2 analyst</button></div>
+      <div id="rvNote" hidden style="margin-top:12px"><label class="caption" for="dlgText">Note for the Tier 2 analyst (required)</label><textarea class="field" id="dlgText" style="margin-top:6px"></textarea><div class="err" id="dlgErr" hidden></div><div class="dlgfoot"><button type="button" class="btn secondary" id="rvBack">Back</button><button type="button" class="btn solid" id="rvSend">Return with note</button></div></div>` });
+  $('#dlgCancel').textContent = 'Cancel';
+  $('#rvTake').addEventListener('click', () => {
+    logEvent('Reviewed the latest decision: went to remediation.', true, 'review'); updateStatus(); dlg.close(); toast('Remediation is below. Mark it done when you finish');
+    expandSection('remediation'); const rm = $('#remediation'); rm.scrollIntoView({behavior: RM()?'auto':'smooth', block:'start'}); flash(rm);
+  });
+  $('#rvReturn').addEventListener('click', () => { $('#rvActs').hidden = true; $('#rvNote').hidden = false; $('#dlgText').focus(); });
+  $('#rvBack').addEventListener('click', () => { $('#rvNote').hidden = true; $('#rvActs').hidden = false; $('#rvReturn').focus(); });
+  $('#rvSend').addEventListener('click', () => {
+    const v = $('#dlgText').value.trim(); if(!v){ const e = $('#dlgErr'); e.hidden = false; e.textContent = 'Add a note so Tier 2 knows what to look at.'; $('#dlgText').focus(); return; }
+    state.lead = 'disagreed'; state.leadNote = v; logEvent(`Reviewed the latest decision: returned to Tier 2. “${v.slice(0,100)}”`, true, 'review'); updateStatus(); dlg.close(); toast('Returned to Tier 2');
+  });
 });
 
 /* ---------- SOC leader: team overview with sample investigations ---------- */
@@ -1640,7 +1769,7 @@ function liveRow(){
 const rowFlag = r => (r.t1&&r.t1.d==='challenged') || (r.t2&&r.t2.d==='challenged');
 function renderOversight(){
   const rows = [liveRow(), ...SAMPLE];
-  const need = rows.filter(r => r.lead==='pending').length, flagged = rows.filter(rowFlag).length, done = rows.filter(r => r.lead==='approved'||r.lead==='disagreed').length;
+  const need = rows.filter(r => r.lead==='pending').length, flagged = rows.filter(rowFlag).length, done = rows.filter(r => r.lead==='approved'||r.lead==='disagreed'||r.lead==='done').length;
   const why = r => r.t2&&r.t2.d==='escalated' ? `${r.t2.who} escalated this to you.` : (r.t1&&r.t1.d==='challenged'&&r.t2&&r.t2.d==='challenged') ? 'Tier 1 and Tier 2 both challenged 7AI.' : 'An analyst challenged 7AI.';
   const needRows = rows.filter(r => r.lead==='pending');
   $('#ovAttention').innerHTML = needRows.length
@@ -1650,11 +1779,11 @@ function renderOversight(){
   $('#ovTeam').innerHTML = `<span class="lab">This week</span><span><b>${decided.length?Math.round(agreed.length/decided.length*100):0}%</b> agree with 7AI</span><span><b>14 min</b> median decision</span><span><b>${rows.filter(rowFlag).length}</b> challenges <span class="caption">(2 last week)</span></span>`;
   const kind0 = $('#ovKind').value; $('#ovStats').innerHTML = [['all',rows.length,'Investigations'],['flag',flagged,'Analyst challenged'],['need',need,'Need your review'],['done',done,'Reviewed by you']].map(([k,n,l]) => `<button type="button" class="stat" data-stat="${k}" aria-pressed="${kind0===k}"><b>${n}</b><span>${l}</span></button>`).join('');
   const who = $('#ovWho').value, kind = $('#ovKind').value;
-  const list = rows.filter(r => (who==='all' || (r[who] && r[who].d)) && (kind==='all' || (kind==='need'&&r.lead==='pending') || (kind==='flag'&&rowFlag(r)) || (kind==='done'&&(r.lead==='approved'||r.lead==='disagreed'))));
+  const list = rows.filter(r => (who==='all' || (r[who] && r[who].d)) && (kind==='all' || (kind==='need'&&r.lead==='pending') || (kind==='flag'&&rowFlag(r)) || (kind==='done'&&(r.lead==='approved'||r.lead==='disagreed'||r.lead==='done'))));
   const vp = v => v==='Malicious' ? '<span class="pill mal">Malicious</span>' : v==='Suspicious' ? '<span class="pill c-sus">Suspicious</span>' : v==='Benign' ? '<span class="pill c-ben">Benign</span>' : v==='Inconclusive' ? '<span class="pill c-inc">Inconclusive</span>' : `<span class="pill neutral">${esc(v)}</span>`;
   const dec = d => d ? `<b style="font-weight:500">${esc(d.d[0].toUpperCase()+d.d.slice(1))}</b><div class="caption">${esc(d.who)}</div>` : '<span class="caption">—</span>';
-  const led = r => r.lead==='approved' ? '<span class="pill rv ok">Approved</span>' : r.lead==='disagreed' ? '<span class="pill rv rv-dis">Disagreed</span>' : r.lead==='pending' ? '<span class="pill rv rv-need">Needs review</span>' : r.withT2 ? '<span class="pill rv rv-t2">With Tier 2</span>' : '<span class="caption">—</span>';
-  $('#ovRows').innerHTML = list.map(r => `<tr class="arow" data-case="${r.id}" tabindex="0"><td><b style="font-weight:${r.live?600:500}">${esc(r.title)}</b>${rowFlag(r)?' <span class="chal" title="An analyst challenged 7AI’s conclusion"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M3.5 14V2.5M3.5 2.5h8l-1.6 3 1.6 3h-8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Challenged</span>':''}${r.live?' <span class="linkbtn" style="margin-left:6px">Open case ›</span>':''}<div class="caption">#${r.id} · ${esc(r.src)}</div></td><td>${vp(r.verdict)}</td><td>${esc(r.sev)}${r.verdict==='Malicious'&&r.sev!=='High'?`<span class="upg" title="7AI rated this as a higher risk" role="img" aria-label="7AI rated this as a higher risk">↑</span>`:''}</td><td>${dec(r.t1)}</td><td>${dec(r.t2)}</td><td>${led(r)}</td><td class="caption" style="white-space:nowrap">${esc(r.when)}</td></tr>`).join('') || '<tr><td colspan="7" class="caption">No investigations match these filters.</td></tr>';
+  const led = r => r.lead==='approved' ? '<span class="pill rv ok">Approved</span>' : r.lead==='done' ? '<span class="pill rv ok">Done</span>' : r.lead==='disagreed' ? '<span class="pill rv rv-dis">Disagreed</span>' : r.lead==='pending' ? '<span class="pill rv rv-need">Needs review</span>' : r.withT2 ? '<span class="pill rv rv-t2">With Tier 2</span>' : '<span class="caption">—</span>';
+  $('#ovRows').innerHTML = list.map(r => `<tr class="arow" data-case="${r.id}" tabindex="0"><td><b style="font-weight:${r.live?600:500}">${esc(r.title)}</b>${rowFlag(r)?' <span class="chal" title="An analyst challenged 7AI’s conclusion"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M3.5 14V2.5M3.5 2.5h8l-1.6 3 1.6 3h-8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Challenged</span>':''}${r.live?' <span class="linkbtn" style="margin-left:6px">Open case ›</span>':''}<div class="caption">#${r.id} · ${esc(r.src)}</div></td><td>${vp(r.verdict)}</td><td style="white-space:nowrap">${esc(r.sev)}${r.verdict==='Malicious'&&r.sev!=='High'?`<span class="upg" tabindex="0" data-tip="7AI rated this as a higher risk" role="img" aria-label="7AI rated this as a higher risk">↑</span>`:''}</td><td>${dec(r.t1)}</td><td>${dec(r.t2)}</td><td>${led(r)}</td><td class="caption" style="white-space:nowrap">${esc(r.when)}</td></tr>`).join('') || '<tr><td colspan="7" class="caption">No investigations match these filters.</td></tr>';
 }
 function exportList(){
   const rows = [liveRow(), ...SAMPLE], q = v => `"${String(v==null?'':v).replace(/"/g,'""')}"`;
