@@ -608,9 +608,143 @@ body[data-screen="list"] .lsub{display:flex}
   #ovTable td:first-child{grid-column:1/-1;min-width:0}
   #ovTable td[data-label]:not(:first-child)::before{content:attr(data-label);display:block;margin-bottom:4px;font:600 11px/14px var(--font);letter-spacing:.04em;text-transform:uppercase;color:var(--text-secondary)}
 }
+
+/* ===================================================================
+   Motion layer. Motion is used to (1) show agents and tools doing work,
+   (2) confirm an action, (3) show where something came from. It is fast
+   (120-300 ms), eases out, never blocks input, and does not loop on idle
+   content. Everything here switches off under prefers-reduced-motion.
+   =================================================================== */
+:root{--ease-out:cubic-bezier(.22,.8,.24,1)}
+@keyframes m-rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes m-drop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@keyframes m-slidel{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+@keyframes m-fade{from{opacity:0}to{opacity:1}}
+@keyframes m-pop{0%{opacity:0;transform:scale(.6)}60%{opacity:1;transform:scale(1.12)}100%{opacity:1;transform:scale(1)}}
+@keyframes m-bump{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+@keyframes m-spin{to{transform:rotate(360deg)}}
+@keyframes m-ring{0%{opacity:.6;transform:scale(.95)}100%{opacity:0;transform:scale(1.75)}}
+@keyframes m-shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+@keyframes m-march{to{stroke-dashoffset:-5}}
+@keyframes m-blink{50%{opacity:0}}
+@keyframes m-twinkle{0%,100%{transform:scale(1) rotate(0);opacity:1}50%{transform:scale(1.25) rotate(15deg);opacity:.7}}
+@keyframes m-drawer{from{transform:translateX(100%)}to{transform:none}}
+@keyframes m-dlg{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes m-toast-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes m-toast-out{to{opacity:0;transform:translateY(6px)}}
+.m-drop{animation:m-drop .2s var(--ease-out)}
+.m-slidel{animation:m-slidel .22s var(--ease-out)}
+.m-pop{animation:m-pop .4s var(--ease-out)}
+.m-bump{animation:m-bump .35s var(--ease-out)}
+.vswap{animation:m-rise .28s var(--ease-out)}
+[data-reviewed]{display:inline-block}
+.num{font-variant-numeric:tabular-nums}
+
+/* micro-interactions */
+.btn,.tlink{transition:background-color .15s,border-color .15s,box-shadow .15s,transform .12s var(--ease-out)}
+.btn:active,.tlink:active{transform:scale(.97)}
+.tab{transition:border-color .2s,color .2s}
+.trow{transition:background-color .15s}
+dialog[open]{animation:m-dlg .2s var(--ease-out)}
+dialog[open]::backdrop{animation:m-fade .2s ease-out}
+dialog.drawer[open]{animation:m-drawer .28s var(--ease-out)}
+.toast{animation:m-toast-in .22s var(--ease-out)}
+.toast.out{animation:m-toast-out .2s ease-in forwards}
+.dsticky:not([hidden]){animation:m-rise .3s var(--ease-out)}
+.menu:not([hidden]){animation:m-drop .16s var(--ease-out);transform-origin:top right}
+
+/* first load: the verdict lands, then the signals, then the body */
+.halo{position:relative}
+body.boot .vcard{animation:m-rise .45s var(--ease-out) backwards}
+body.boot .shield{animation:m-pop .5s var(--ease-out) .2s backwards}
+body.boot .halo::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--danger);opacity:0;pointer-events:none;animation:m-ring 1.5s var(--ease-out) .7s 2}
+body.boot .vmeta .pill{animation:m-pop .4s var(--ease-out) backwards}
+body.boot .vmeta .pill:nth-child(1){animation-delay:.45s}
+body.boot .vmeta .pill:nth-child(2){animation-delay:.55s}
+body.boot .vmeta .pill:nth-child(3){animation-delay:.65s}
+body.boot .sigrow .cell{animation:m-rise .4s var(--ease-out) backwards}
+body.boot .sigrow .cell:nth-child(1){animation-delay:.25s}
+body.boot .sigrow .cell:nth-child(2){animation-delay:.32s}
+body.boot .sigrow .cell:nth-child(3){animation-delay:.39s}
+body.boot .sigrow .cell:nth-child(4){animation-delay:.46s}
+body.boot #colL>*,body.boot #colR>*{animation:m-rise .45s var(--ease-out) backwards}
+body.boot #colL>*:nth-child(1),body.boot #colR>*:nth-child(1){animation-delay:.45s}
+body.boot #colL>*:nth-child(2),body.boot #colR>*:nth-child(2){animation-delay:.53s}
+body.boot #colL>*:nth-child(3),body.boot #colR>*:nth-child(3){animation-delay:.61s}
+body.boot #colL>*:nth-child(4),body.boot #colR>*:nth-child(4){animation-delay:.69s}
+
+/* replay: agents run one at a time, tools resolve, 7AI writes its summary */
+.rprog{height:3px;margin-top:14px;border-radius:3px;background:transparent;overflow:hidden;transition:background-color .3s}
+.rprog i{display:block;height:100%;width:0;border-radius:3px;background:var(--accent);transition:width .6s var(--ease-out)}
+#report.replaying .rprog{background:var(--border)}
+.agent{transition:border-color .25s,box-shadow .25s}
+.agent.running{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.aicon{position:relative}
+.agent.running .aicon::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:2px solid transparent;border-top-color:var(--accent);animation:m-spin .8s linear infinite}
+.tool.working .trow .pill{display:none}
+.tool.queued .trow .pill{visibility:hidden}
+.tool.working .trow .chev{order:2}
+.tool.working .trow::after{content:"";order:1;flex:none;width:78px;height:18px;border-radius:999px;background:linear-gradient(90deg,var(--border) 30%,#f6f6fc 50%,var(--border) 70%);background-size:200% 100%;animation:m-shimmer 1.1s linear infinite}
+.sumtext{display:block}
+.sumtext.streaming::after{content:"";display:inline-block;width:2px;height:1em;margin-left:2px;vertical-align:-2px;background:var(--accent);animation:m-blink 1s steps(2) infinite}
+.asum:has(.streaming) .lab .sparkle{animation:m-twinkle 1s ease-in-out infinite}
+
+/* entity graph: nodes and edges appear outward from the alert; selection lights its edges */
+.edges mask path{fill:none;stroke:#fff;stroke-width:6;stroke-dasharray:1;stroke-dashoffset:1;stroke-linecap:butt;transition:stroke-dashoffset .55s var(--ease-out)}
+.edges.in mask path{stroke-dashoffset:0}
+.edges path.e{transition:stroke .2s,stroke-width .2s}
+.edges path.e.rel{stroke:var(--accent);stroke-width:1.8;animation:m-march .7s linear infinite}
+.node{transition:opacity .35s ease,transform .5s cubic-bezier(.3,1.35,.5,1)}
+.node.pre{opacity:0;transform:translate(-50%,-26px) scale(.6)}
+.ndisc{transition:box-shadow .2s,transform .2s var(--ease-out)}
+.node:hover .ndisc{transform:scale(1.07)}
+.node.mal .nhalo{position:relative}
+.node.mal .nhalo::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--danger);opacity:0;pointer-events:none}
+.map.revealed .node.mal .nhalo::after{animation:m-ring 1.6s var(--ease-out) 1.2s 2}
+
+/* lower sections ease in as they scroll into view */
+.m-rv{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s var(--ease-out)}
+.m-rv.in{opacity:1;transform:none}
+.m-rv .remi{opacity:0;transform:translateY(8px);transition:opacity .4s ease,transform .4s var(--ease-out)}
+.m-rv.in .remi{opacity:1;transform:none}
+.m-rv.in .remi:nth-child(1){transition-delay:.12s}
+.m-rv.in .remi:nth-child(2){transition-delay:.2s}
+.m-rv.in .remi:nth-child(3){transition-delay:.28s}
+/* replay speed + skip */
+.rspeed{display:inline-flex;align-items:center;gap:6px}
+.rspeed .seg button{padding:4px 10px;font-size:11px}
+/* decision bar morphs into its confirmation */
+.dbar{transition:background-color .3s}
+.halo.ringing::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--danger);opacity:0;pointer-events:none;animation:m-ring 1.2s var(--ease-out) .3s 2}
+/* live (in-progress) investigation: the verdict card shows work, then resolves */
+.livebar{display:none;align-items:center;gap:12px;padding:10px 24px;border-top:1px solid var(--border);background:var(--accent-soft);font-size:13px}
+.vcard.live .livebar{display:flex}
+.livebar .spin{width:14px;height:14px;flex:none;border-radius:50%;border:2px solid rgba(109,95,193,.25);border-top-color:var(--accent);animation:m-spin .8s linear infinite}
+.livebar .lt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--accent-ink);font-weight:500}
+.livebar .lp{flex:0 0 160px;height:4px;border-radius:2px;background:rgba(109,95,193,.2);overflow:hidden}
+.livebar .lp i{display:block;height:100%;width:0;background:var(--accent);transition:width .5s var(--ease-out)}
+.vcard.live .shield{background:var(--accent);color:#fff}
+.vcard.live .halo{background:var(--accent-soft)}
+.vcard.live .halo::before{content:"";position:absolute;inset:-3px;border-radius:50%;border:3px solid transparent;border-top-color:var(--accent);animation:m-spin .9s linear infinite}
+.vcard.live .vmeta .pill:not(.pill-live){display:none}
+.pill-live{display:none;background:var(--accent-soft);color:var(--accent-ink)}
+.vcard.live .pill-live{display:inline-flex;align-items:center}
+.pill-live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);margin-right:6px;animation:m-blink 1s steps(2) infinite}
+.cell.skel .val,.cell.skel .sub{color:transparent!important;width:fit-content;border-radius:4px;background:linear-gradient(90deg,var(--border) 30%,#f6f6fc 50%,var(--border) 70%);background-size:200% 100%;animation:m-shimmer 1.1s linear infinite}
+.cell.skel .dotred,.cell.skel .val svg,.cell.skel .label .sparkle{visibility:hidden}
+.vcard.live .reason-link{pointer-events:none}
+.vcard.live .reason-link .cv{opacity:0}
+.vcard.live .cell{cursor:default}
+.lv-hide{display:none!important}
+#conclusion.lv-wait>:not(h2){display:none}
+#conclusion.lv-wait::after{content:"";height:92px;border-radius:6px;background:linear-gradient(90deg,var(--border) 30%,#f6f6fc 50%,var(--border) 70%);background-size:200% 100%;animation:m-shimmer 1.1s linear infinite}
+#kfList.lv-empty::before{content:"Findings appear here as 7AI confirms them.";display:block;padding:14px 0;color:var(--text-secondary);font-size:13px}
+/* align the input-card pill with the tool-row pills (chevron 16px + gap 12px) */
+.ainput .row1{padding-right:28px}
+@media print{.m-rv,.m-rv .remi{opacity:1!important;transform:none!important}}
 </style>
 </head>
-<body>
+<body class="boot">
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -679,8 +813,10 @@ body[data-screen="list"] .lsub{display:flex}
         <button class="tlink" id="btnHistory"><span class="dot" id="histDot" hidden></span><svg class="i"><use href="#i-clock"/></svg>Investigation history</button>
         <button class="tlink" id="btnFeedback"><svg class="i"><use href="#i-msg"/></svg>Add feedback</button>
         <button class="tlink" id="btnReplay" aria-pressed="false"><svg class="i play" id="replayIcon"><use href="#i-play"/></svg><span id="replayLabel">Replay</span></button>
+        <span class="rspeed" id="replaySpeed" hidden role="group" aria-label="Replay speed"><span class="seg"><button type="button" data-speed="1" aria-pressed="true">1x</button><button type="button" data-speed="2" aria-pressed="false">2x</button></span><button type="button" class="tlink" data-skip>Skip to end</button></span>
         <button class="btn icon" id="btnMore" aria-label="More actions" aria-haspopup="menu" aria-expanded="false"><svg class="i"><use href="#i-more"/></svg></button>
         <div class="menu" id="moreMenu" role="menu" hidden>
+          <button role="menuitem" id="miLive"><svg class="i"><use href="#i-play"/></svg>Watch investigation live</button>
           <button role="menuitem" id="btnInsight"><svg class="i"><use href="#i-bulb"/></svg>Add alert insight</button>
           <button role="menuitem" id="miDownload"><svg class="i"><use href="#i-download"/></svg>Download report</button>
           <button role="menuitem" id="miCopy"><svg class="i"><use href="#i-link"/></svg>Copy link</button>
@@ -703,11 +839,12 @@ body[data-screen="list"] .lsub{display:flex}
         <div style="min-width:0">
         <div class="eyebrow">Microsoft Sentinel alert for ransomware was prevented</div>
         <h1 class="vtitle2">‘Black Basta’ ransomware was prevented on <span style="white-space:nowrap">JACKSON-LAPTOP-7334</span></h1>
-        <div class="vmeta"><span class="pill mal">Malicious</span><span class="pill neutral">Escalated</span><span class="pill ok" id="reviewPill" hidden></span></div>
+        <div class="vmeta"><span class="pill mal">Malicious</span><span class="pill neutral">Escalated</span><span class="pill ok" id="reviewPill" hidden></span><span class="pill pill-live">Investigating</span></div>
         </div>
       </div>
       <div class="vtime" title="7AI received the alert at 11:06:31 AM and reached a conclusion at 11:07:09 AM"><b>Completed in 38 seconds</b><span>Dec 2, 2024 · 11:06:31–11:07:09 AM</span></div>
     </div>
+    <div class="livebar" id="liveBar"><span class="spin" aria-hidden="true"></span><span class="lt" id="liveText"></span><span class="lp" aria-hidden="true"><i id="liveProg"></i></span></div>
     <div class="pnote" id="personaNote" hidden></div>
     <div class="sigrow">
       <div class="cell" data-sig="severity"><span class="label">Source severity</span><span class="val">Low</span><span class="sub">Rated by Microsoft Sentinel</span><button class="reason-link" data-reason="severity" aria-expanded="false" aria-controls="reasoning" title="View reasoning"><span class="sr-only">View reasoning for source severity</span><svg class="i cv" aria-hidden="true"><use href="#i-chevd"/></svg></button></div>
@@ -743,6 +880,7 @@ body[data-screen="list"] .lsub{display:flex}
           <div><h2 class="cardtitle" style="font-size:18px">Agentic investigation report</h2><div class="caption" style="margin-top:2px">Agents, checks, and supporting results</div></div>
           <div style="display:flex;gap:4px"><button class="tlink" id="btnExpandAll">Expand all</button><button class="tlink" id="btnCollapseAll">Collapse all</button></div>
         </div>
+        <div class="rprog" aria-hidden="true"><i></i></div>
         <div class="agents" id="steps"></div>
       </div>
 
@@ -902,6 +1040,7 @@ body[data-screen="list"] .lsub{display:flex}
 <dialog id="dlg" aria-labelledby="dlgTitle"><form method="dialog" id="dlgForm"><h2 id="dlgTitle"></h2><div id="dlgBody"></div><div class="dlgfoot"><button class="btn secondary" value="cancel" id="dlgCancel" type="button">Cancel</button><button class="btn primary" id="dlgOk" type="submit"></button></div></form></dialog>
 <dialog id="drawer" class="drawer" aria-labelledby="drawerTitle"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px"><h2 id="drawerTitle" style="margin:0">Investigation History</h2><button class="btn icon" id="drawerClose" aria-label="Close history"><svg class="i"><use href="#i-x"/></svg></button></div><div class="timeline" id="timelineDrawer"></div></dialog>
 <div id="toasts" role="status" aria-live="polite"></div>
+<div class="sr-only" id="replayLive" role="status" aria-live="polite"></div>
 
 <script>
 (() => {
@@ -946,6 +1085,7 @@ const ENT = [
 const EDGES = [['alert','device'],['device','user'],['device','file'],['device','domain']];
 const KIND_COLOR = { alert:'var(--entity-alert)', device:'var(--chart-elite)', hash:'var(--entity-hash)', network:'var(--entity-network)' };
 const STAGE_W = 1060, STAGE_H = 560;
+const DEPTH = (() => { const d={alert:0}, q=['alert']; while(q.length){ const c=q.shift(); EDGES.forEach(([a,b]) => { if(a===c && !(b in d)){ d[b]=d[c]+1; q.push(b); } }); } return d; })();
 
 const state = {
   reviewed:new Set(), review:'pending', view:'t1', screen:'case', open:new Set(), t2:'pending', lead:'pending', leadNote:'', esc:null, auditAll:false, f:{who:'all',kind:'all'}, replaying:false, cancelReplay:false, sel:null, zoom:1, pan:{x:0,y:0},
@@ -958,8 +1098,11 @@ const state = {
 };
 
 /* ---------- toasts, accordions ---------- */
-function toast(msg){ const el=document.createElement('div'); el.className='toast'; el.textContent=msg; $('#toasts').appendChild(el); setTimeout(()=>el.remove(),2800); }
-function setExpanded(btn, open){ btn.setAttribute('aria-expanded', open); const p=document.getElementById(btn.getAttribute('aria-controls')); if(p) p.hidden=!open; }
+const RM = () => matchMedia('(prefers-reduced-motion:reduce)').matches;
+function play(el, cls){ if(!el) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+function morph(el, fn){ if(RM()){ fn(); return; } const h0=el.offsetHeight; fn(); const h1=el.offsetHeight; if(h0===h1||!h0) return; el.style.overflow='hidden'; el.style.height=h0+'px'; void el.offsetHeight; el.style.transition='height .3s var(--ease-out)'; el.style.height=h1+'px'; setTimeout(()=>{ el.style.height=''; el.style.transition=''; el.style.overflow=''; },340); }
+function toast(msg){ const el=document.createElement('div'); el.className='toast'; el.textContent=msg; $('#toasts').appendChild(el); setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(), RM()?0:200); }, 2600); }
+function setExpanded(btn, open){ const was=btn.getAttribute('aria-expanded')==='true'; btn.setAttribute('aria-expanded', open); const p=document.getElementById(btn.getAttribute('aria-controls')); if(p){ p.hidden=!open; if(open && !was) play(p,'m-drop'); } }
 document.addEventListener('click', e => { const b = e.target.closest('.acc-btn'); if(!b) return; setExpanded(b, b.getAttribute('aria-expanded')!=='true'); });
 
 /* ---------- agentic report ---------- */
@@ -989,7 +1132,7 @@ function renderSteps(){
             : `<div class="muted">Not provided in the report</div>`}</div>
         </div>
       </div>`).join('')}
-      <div class="asum" id="sum-${s.id}"><div class="lab">7AI summary${icon('sparkle','sparkle')}</div>${esc(s.summary)}</div>
+      <div class="asum" id="sum-${s.id}"><div class="lab">7AI summary${icon('sparkle','sparkle')}</div><span class="sumtext">${esc(s.summary)}</span></div>
     </div>
   </div>`).join('');
 }
@@ -1009,7 +1152,7 @@ function renderKF(){
     <button class="vev" data-kf="${k.id}">View evidence ${icon('chev')}</button>
   </div>`).join('');
 }
-function markReviewed(id){ if(state.reviewed.has(id)) return; state.reviewed.add(id); const el=$('#kf-'+id); el.classList.add('reviewed'); $('.ico',el).setAttribute('aria-label','Reviewed'); $$('[data-reviewed]').forEach(n=>n.textContent=state.reviewed.size); if(typeof updDecide==='function') updDecide(); }
+function markReviewed(id){ if(state.reviewed.has(id)) return; state.reviewed.add(id); const el=$('#kf-'+id); el.classList.add('reviewed'); play($('.ico',el),'m-pop'); $('.ico',el).setAttribute('aria-label','Reviewed'); $$('[data-reviewed]').forEach(n=>{ n.textContent=state.reviewed.size; play(n,'m-bump'); }); if(typeof updDecide==='function') updDecide(); }
 function openKF(id){ const k=KF.find(x=>x.id===+id); openTool(k.tool); markReviewed(k.id); goTo(document.getElementById(k.tool)); }
 document.addEventListener('click', e => {
   const k = e.target.closest('[data-kf]'); if(k){ openKF(k.dataset.kf); return; }
@@ -1029,7 +1172,7 @@ function renderTimeline(){
   $('#auditMore').innerHTML = more; $('#timelineDrawer').innerHTML = all.map(evHtml).join('');
 }
 function whoNow(){ return {t1:'Tier 1',t2:'Tier 2',lead:'SOC leader'}[state.view]; }
-function logEvent(text, key=false, kind){ kind = kind || (/^(Conclusion (confirmed|challenged)|Escalated|Re-scan requested)/.test(text)?'decision':/^Reviewed/.test(text)?'review':'note'); state.history.push({t:nowTime(), text, key, you:true, who:whoNow(), name:PEOPLE[state.view].name, kind}); renderTimeline(); if(!$('#drawer').open) $('#histDot').hidden=false; }
+function logEvent(text, key=false, kind){ kind = kind || (/^(Conclusion (confirmed|challenged)|Escalated|Re-scan requested)/.test(text)?'decision':/^Reviewed/.test(text)?'review':'note'); state.history.push({t:nowTime(), text, key, you:true, who:whoNow(), name:PEOPLE[state.view].name, kind}); renderTimeline(); play($('#timelineInline .ev:last-child'),'m-drop'); play($('#timelineDrawer .ev:last-child'),'m-drop'); if(!$('#drawer').open) $('#histDot').hidden=false; }
 
 /* ---------- dialogs ---------- */
 const dlg = $('#dlg');
@@ -1052,18 +1195,20 @@ let decideVisible = true, decideEditing = false;
 function updDecide(){
   const d = $('#decide'), st = $('#decideSticky'); if(!d) return;
   const n = state.reviewed.size; d.style.setProperty('--n', n); d.dataset.n = n;
-  const done = state.review!=='pending' && !decideEditing; d.dataset.state = done ? state.review : 'pending';
-  $('.dacts',d).hidden = done; $('#decideDone').hidden = !done;
+  const done = state.review!=='pending' && !decideEditing; const changed = d._done!==undefined && d._done!==done; d._done = done;
+  const apply = () => { d.dataset.state = done ? state.review : 'pending'; $('.dacts',d).hidden = done; $('#decideDone').hidden = !done;
   if(done){ const ok = state.review==='confirmed';
-    $('#decideDone').innerHTML = `<span class="dmark ${ok?'ok':'warn'}" aria-hidden="true">${icon(ok?'check':'info')}</span><div><b>${ok?'You confirmed the conclusion':'You escalated to Tier 2'}</b><span class="s">${ok?`Saved at ${esc(state.reviewAt||'')} · in the audit trail`:`Sent to ${esc(PEOPLE.t2.name)}, Tier 2 · ${esc(state.reviewAt||'')}`}</span></div><button type="button" class="linkbtn" id="decideChange">Change decision</button>`; }
-  st.hidden = !(state.view==='t1' && state.screen==='case' && !decideVisible && state.review==='pending');
+    $('#decideDone').innerHTML = `<span class="dmark ${ok?'ok':'warn'}" aria-hidden="true">${icon(ok?'check':'info')}</span><div><b>${ok?'You confirmed the conclusion':'You escalated to Tier 2'}</b><span class="s">${ok?`Saved at ${esc(state.reviewAt||'')} · in the audit trail`:`Sent to ${esc(PEOPLE.t2.name)}, Tier 2 · ${esc(state.reviewAt||'')}`}</span></div><button type="button" class="linkbtn" id="decideChange">Change decision</button>`; } };
+  if(changed && !state.live) morph(d, apply); else apply();
+  if(changed && done){ play($('#decideDone'),'m-rise'); play($('.dmark',d),'m-pop'); }
+  st.hidden = !(state.view==='t1' && state.screen==='case' && !decideVisible && state.review==='pending' && !state.live);
 }
 document.addEventListener('click', e => { if(e.target.closest('#decideChange')){ decideEditing = true; updDecide(); $('#decide [data-act="confirm"]').focus(); } });
 function setReview(kind, note){
   decideEditing = false; state.reviewAt = nowTime();
   state.review = kind; if(kind==='challenged') state.esc = {reason:note};
-  const pill=$('#reviewPill'); pill.hidden=false; pill.className='pill '+(kind==='confirmed'?'ok':'warn'); pill.textContent=kind==='confirmed'?'Approved by Tier 1':'Sent to Tier 2';
-  $('#sigReview').textContent = kind==='confirmed' ? 'Analyst review: confirmed' : 'Analyst review: escalated';
+  const pill=$('#reviewPill'); pill.hidden=false; pill.className='pill '+(kind==='confirmed'?'ok':'warn'); pill.textContent=kind==='confirmed'?'Approved by Tier 1':'Sent to Tier 2'; play(pill,'m-pop');
+  $('#sigReview').textContent = kind==='confirmed' ? 'Analyst review: confirmed' : 'Analyst review: escalated'; play($('#sigReview'),'m-drop');
   $('#reviewStatus').innerHTML = kind==='confirmed' ? `<b>Confirmed</b> by Dennis Nedry at ${esc(nowTime())}.` : `<b>Escalated</b> by Dennis Nedry at ${esc(nowTime())}: “${esc(note||'')}”`;
   updateStatus(); updDecide();
 }
@@ -1115,17 +1260,90 @@ $$('[data-stub]').forEach(el => el.addEventListener('click', e => { e.preventDef
 /* ---------- replay: plays the investigation back, agent by agent and tool by tool ---------- */
 const sleep = ms => new Promise(r=>setTimeout(r, matchMedia('(prefers-reduced-motion:reduce)').matches?Math.min(ms,150):ms));
 function setReplayUI(on){ state.replaying=on; $('#replayLabel').textContent=on?'Stop':'Replay'; $('#replayIcon').innerHTML=`<use href="#i-${on?'stop':'play'}"/>`; $('#btnReplay').setAttribute('aria-pressed',on); }
-async function replay(){
-  if(state.replaying){ state.cancelReplay=true; return; }
-  state.cancelReplay=false; setReplayUI(true); expandSection('report'); $('#btnCollapseAll').click(); $('#report').scrollIntoView({block:'start'});
-  const stop = () => state.cancelReplay;
-  for(const s of STEPS){
-    if(stop()) break; openStep(s.id); goTo($('#step-'+s.id)); await sleep(900);
-    for(const t of s.tools){ if(stop()) break; const el=document.getElementById(t.id); setExpanded($('.trow',el),true); flash(el); await sleep(900); }
-    if(stop()) break; const c=$('#sum-'+s.id); c.classList.add('hl'); await sleep(1100); c.classList.remove('hl');
-  }
-  setReplayUI(false); toast(stop()?'Replay stopped':'Replay finished: 5 tools run across 2 agents');
+const tsleep = ms => new Promise(r => { if(state.skip){ r(); return; } const done = () => { clearTimeout(t); state.wake=null; r(); }; const t = setTimeout(done, (RM()?Math.min(ms,150):ms)/(state.speed||1)); state.wake = done; });
+const say = msg => { const l=$('#replayLive'); if(l) l.textContent=msg; };
+async function streamText(el, full, msPerWord, stop){
+  if(RM()){ el.textContent=full; return; }
+  const words=full.split(' '); el.style.minHeight=el.offsetHeight+'px'; el.textContent=''; el.classList.add('streaming');
+  for(let i=0;i<words.length;i++){ if(stop()||state.skip) break; el.textContent=words.slice(0,i+1).join(' '); await tsleep(msPerWord); }
+  el.textContent=full; el.classList.remove('streaming'); el.style.minHeight='';
 }
+function countUpTime(delay){
+  if(RM()) return; const b=$('.vtime b'); const m=b && b.textContent.match(/^(.*?)(\d+)(.*)$/); if(!m) return;
+  const to=+m[2]; b.innerHTML=esc(m[1])+'<span class="num">0</span>'+esc(m[3]); const num=$('.num',b), t0=performance.now()+delay;
+  const step=t=>{ const p=Math.min(1,Math.max(0,(t-t0)/900)); num.textContent=Math.round(to*(1-Math.pow(1-p,3))); if(p<1) requestAnimationFrame(step); else b.textContent=m[0]; };
+  requestAnimationFrame(step);
+}
+/* live mode: the verdict card shows the investigation in progress, then resolves */
+const LIVE = { saved:'', cur:0, target:0, raf:0 };
+let VT_HTML = null; // canonical time block, captured before any count-up runs
+const liveProg = f => { const i=$('#liveProg'); if(i) i.style.width=(f*100)+'%'; };
+function liveShow(el){ if(!el||!el.classList.contains('lv-hide')) return; el.classList.remove('lv-hide'); play(el,'m-rise'); }
+function liveKF(id){ const k=$('#kf-'+id); if(!k) return; liveShow(k); $('#kfList').classList.remove('lv-empty'); }
+function liveCell(key){ const c=$(`.cell[data-sig="${key}"]`); if(!c||!c.classList.contains('skel')) return; c.classList.remove('skel'); play($('.val',c),'m-drop'); play($('.sub',c),'m-drop'); }
+function liveStart(){
+  state.live=true; closeReasoning();
+  const vc=$('#verdictZone'), vt=$('.vtime'); if(VT_HTML===null) VT_HTML=vt.innerHTML; LIVE.saved=VT_HTML; LIVE.cur=0; LIVE.target=0;
+  vc.classList.add('live');
+  ['verdict','scope','workflow'].forEach(k=>{ const c=$(`.cell[data-sig="${k}"]`); if(c) c.classList.add('skel'); });
+  ['decide','personaNote','limit'].forEach(id=>{ const e=document.getElementById(id); if(e) e.classList.add('lv-hide'); });
+  $$('.kf').forEach(k=>k.classList.add('lv-hide')); $('#kfList').classList.add('lv-empty'); $('#conclusion').classList.add('lv-wait');
+  $('#liveText').textContent='Alert received from Microsoft Sentinel'; liveProg(0);
+  vt.innerHTML='<b>Investigating…</b><span></span>'; const sp=$('span',vt);
+  const tick=()=>{ LIVE.cur += (LIVE.target-LIVE.cur)*0.08; if(Math.abs(LIVE.target-LIVE.cur)<.05) LIVE.cur=LIVE.target; const e=Math.floor(LIVE.cur); sp.textContent=`Started 11:06:31 AM · elapsed 0:${String(e).padStart(2,'0')}`; LIVE.raf=requestAnimationFrame(tick); };
+  tick(); updDecide();
+}
+function liveFinish(){
+  if(!state.live) return; state.live=false; cancelAnimationFrame(LIVE.raf);
+  const vc=$('#verdictZone'), vt=$('.vtime');
+  vc.classList.remove('live'); vt.innerHTML=LIVE.saved; countUpTime(150);
+  $$('.cell.skel').forEach((c,i)=>{ c.classList.remove('skel'); setTimeout(()=>{ play($('.val',c),'m-drop'); play($('.sub',c),'m-drop'); }, i*90); });
+  $$('.vmeta .pill:not(.pill-live)').forEach((p,i)=>setTimeout(()=>play(p,'m-pop'), 120+i*100));
+  play($('.shield',vc),'m-pop'); play($('.halo',vc),'ringing');
+  $$('.lv-hide').forEach(e=>{ e.classList.remove('lv-hide'); play(e,'m-rise'); });
+  $('#kfList').classList.remove('lv-empty');
+  const c=$('#conclusion'); c.classList.remove('lv-wait'); $$(':scope > :not(h2)',c).forEach((e,i)=>setTimeout(()=>play(e,'m-rise'), i*70));
+  updDecide();
+}
+async function runReplay(live){
+  if(state.replaying){ state.cancelReplay=true; state.wake && state.wake(); return; }
+  if(state.view==='lead' && state.screen==='list') openCase();
+  state.cancelReplay=false; state.skip=false; setReplayUI(true); $('#replaySpeed').hidden=false;
+  expandSection('report'); $('#btnCollapseAll').click();
+  if(live){ window.scrollTo({top:0, behavior:RM()?'auto':'smooth'}); liveStart(); } else $('#report').scrollIntoView({block:'start'});
+  const rep=$('#report'), bar=$('.rprog i',rep), total=STEPS.reduce((n,s)=>n+s.tools.length+1,0); let done=0;
+  const tick=()=>{ done++; const f=done/total; bar.style.width=(f*100)+'%'; if(live){ liveProg(f); LIVE.target=f*38; } };
+  $$('.tool').forEach(t=>t.classList.add('queued')); bar.style.transition='none'; bar.style.width='0%'; void bar.offsetWidth; bar.style.transition=''; rep.classList.add('replaying'); rep.setAttribute('aria-busy','true');
+  const stop = () => state.cancelReplay;
+  const note = t => { if(live) $('#liveText').textContent=t; say(t); };
+  say(live?'Investigation started':'Replay started');
+  for(const s of STEPS){
+    if(stop()) break;
+    const ag=$('#step-'+s.id); ag.classList.add('running'); openStep(s.id); if(!live) goTo(ag); note(`${s.name} started`); await tsleep(700);
+    for(const t of s.tools){
+      if(stop()) break;
+      const el=document.getElementById(t.id), row=$('.trow',el); el.classList.remove('queued'); el.classList.add('working'); note(`${s.name} is running ${t.name}`); await tsleep(850);
+      el.classList.remove('working'); setExpanded(row,true); play($('.pill',row),'m-pop'); flash(el); tick(); say(`${t.name} finished${t.result?': '+t.result:''}`);
+      if(live && t.id==='t-ip') liveShow($('#limit'));
+      if(live && t.id==='t-conn') liveKF(3);
+      await tsleep(700);
+    }
+    if(!stop()){ const c=$('#sum-'+s.id); c.classList.add('hl'); note(`${s.name}: writing its summary`); await streamText($('.sumtext',c), s.summary, 38, stop); tick(); await tsleep(500); c.classList.remove('hl'); }
+    if(live && !stop()){ if(s.id==='edr'){ liveKF(1); setTimeout(()=>liveKF(2),140); } if(s.id==='device') liveCell('scope'); }
+    ag.classList.remove('running');
+  }
+  if(live && !stop()){ note('Reaching a conclusion'); LIVE.target=38; await tsleep(600); }
+  $$('.agent').forEach(a=>a.classList.remove('running')); $$('.tool').forEach(t=>t.classList.remove('working','queued'));
+  if(live) liveFinish();
+  rep.removeAttribute('aria-busy'); $('#replaySpeed').hidden=true; state.speed=1; $$('#replaySpeed [data-speed]').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.speed==='1')));
+  setReplayUI(false);
+  const msg = stop() ? (live?'Live view stopped':'Replay stopped') : (live?'Investigation complete: Malicious, escalated (38 sec)':'Replay finished: 5 tools run across 2 agents');
+  toast(msg); say(msg);
+  setTimeout(()=>{ if(!state.replaying) rep.classList.remove('replaying'); }, 1400);
+}
+async function replay(){ return runReplay(false); }
+$('#miLive').addEventListener('click', () => { closeMenu(); runReplay(true); });
+$('#replaySpeed').addEventListener('click', e => { const b=e.target.closest('button'); if(!b) return; if(b.hasAttribute('data-skip')){ state.skip=true; state.wake && state.wake(); return; } state.speed=+b.dataset.speed; $$('#replaySpeed [data-speed]').forEach(x=>x.setAttribute('aria-pressed', String(x===b))); });
 $('#btnReplay').addEventListener('click', replay);
 
 /* ---------- artifacts: table + discovery graph ---------- */
@@ -1135,13 +1353,24 @@ function renderArtifacts(){
 }
 function renderMap(){
   stage.insertAdjacentHTML('beforeend', ENT.map(n=>`
-    <button class="node ${n.mal?'mal':''}" data-id="${n.id}" aria-pressed="false" style="left:${n.x}px;top:${n.y}px" aria-label="${esc(n.type)}: ${esc(n.value)}${n.mal?', malicious':''}" title="${esc(n.type)}: ${esc(n.value)}">
+    <button class="node pre ${n.mal?'mal':''}" data-d="${DEPTH[n.id]}" data-id="${n.id}" aria-pressed="false" style="left:${n.x}px;top:${n.y}px" aria-label="${esc(n.type)}: ${esc(n.value)}${n.mal?', malicious':''}" title="${esc(n.type)}: ${esc(n.value)}">
       <span class="nhalo"><span class="ndisc" style="background:${KIND_COLOR[n.kind]};${n.kind==='hash'?'color:var(--text-primary)':''}">${icon(n.icon)}</span></span>
       <span class="ntype">${esc(n.type)}</span><span class="nval">${esc(n.value)}</span>
     </button>`).join(''));
-  $('#edges').innerHTML = EDGES.map(([a,b])=>{ const A=ENT.find(n=>n.id===a), B=ENT.find(n=>n.id===b); const x1=A.x+44,y1=A.y,x2=B.x-44,y2=B.y,xm=(x1+x2)/2; return `<path d="M${x1} ${y1} C ${xm} ${y1}, ${xm} ${y2}, ${x2} ${y2}"/>`; }).join('');
+  const eds = EDGES.map(([a,b]) => { const A=ENT.find(n=>n.id===a), B=ENT.find(n=>n.id===b); const x1=A.x+44,y1=A.y,x2=B.x-44,y2=B.y,xm=(x1+x2)/2; return {a,b,d:`M${x1} ${y1} C ${xm} ${y1}, ${xm} ${y2}, ${x2} ${y2}`}; });
+  $('#edges').innerHTML = `<defs>${eds.map((e,i)=>`<mask id="em${i}" maskUnits="userSpaceOnUse" x="-40" y="-40" width="${STAGE_W+80}" height="${STAGE_H+80}"><path class="m" data-d="${DEPTH[e.a]}" pathLength="1" d="${e.d}"/></mask>`).join('')}</defs>` + eds.map((e,i)=>`<path class="e" data-a="${e.a}" data-b="${e.b}" mask="url(#em${i})" d="${e.d}"/>`).join('');
   fitMap();
 }
+let mapShown = false;
+function revealMap(){
+  const ed=$('#edges'), nodes=$$('.node',stage); mapShown=true;
+  if(RM()){ nodes.forEach(n=>n.classList.remove('pre')); ed.classList.add('in'); map.classList.add('revealed'); return; }
+  nodes.forEach(n => { const same=nodes.filter(x=>x.dataset.d===n.dataset.d); n.style.transitionDelay=(+n.dataset.d*0.32 + same.indexOf(n)*0.09)+'s'; });
+  $$('#edges mask path').forEach(m => { m.style.transitionDelay=(+m.dataset.d*0.32+0.18)+'s'; });
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ nodes.forEach(n=>n.classList.remove('pre')); ed.classList.add('in'); map.classList.add('revealed'); }));
+  setTimeout(()=>{ nodes.forEach(n=>n.style.transitionDelay=''); },1800);
+}
+function resetMap(){ $$('.node',stage).forEach(n=>{ n.style.transitionDelay=''; n.classList.add('pre'); }); $('#edges').classList.remove('in'); map.classList.remove('revealed'); }
 function applyView(){ stage.style.transform=`translate(${state.pan.x}px,${state.pan.y}px) scale(${state.zoom})`; }
 function fitMap(){ const r=map.getBoundingClientRect(); if(!r.width) return; const z=Math.min(1.1,(r.width-40)/STAGE_W,(r.height-40)/STAGE_H); state.zoom=Math.max(.2,z); state.pan.x=(r.width-STAGE_W*state.zoom)/2; state.pan.y=(r.height-STAGE_H*state.zoom)/2; applyView(); }
 function zoomBy(f){ const r=map.getBoundingClientRect(), cx=r.width/2, cy=r.height/2, z=Math.min(2,Math.max(.4,state.zoom*f)), k=z/state.zoom; state.pan.x=cx-(cx-state.pan.x)*k; state.pan.y=cy-(cy-state.pan.y)*k; state.zoom=z; applyView(); }
@@ -1153,21 +1382,21 @@ map.addEventListener('pointermove', e => { if(!drag) return; state.pan.x=e.clien
 map.addEventListener('pointerup', () => { drag=null; map.classList.remove('dragging'); });
 window.addEventListener('resize', fitMap);
 function selectEntity(id){
-  state.sel=id; $$('.node').forEach(n=>n.setAttribute('aria-pressed',n.dataset.id===id));
-  const n=ENT.find(x=>x.id===id), p=$('#mapPanel'); p.hidden=false;
+  state.sel=id; $$('.node').forEach(n=>n.setAttribute('aria-pressed',n.dataset.id===id)); $$('#edges path.e').forEach(pa=>pa.classList.toggle('rel', pa.dataset.a===id||pa.dataset.b===id));
+  const n=ENT.find(x=>x.id===id), p=$('#mapPanel'); p.hidden=false; play(p,'m-slidel');
   p.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div><div class="label">${esc(n.type)}</div><div class="cardtitle" style="word-break:break-word;margin-top:2px">${esc(n.value)}</div></div><button class="btn icon" id="panelClose" aria-label="Close details">${icon('x')}</button></div>
   <div style="margin:8px 0 12px">${n.mal?'<span class="pill mal">Malicious</span>':'<span class="pill neutral">Context</span>'}</div>
   <div style="display:flex;gap:16px;margin-bottom:16px"><button class="linkbtn" id="pCopy">${icon('copy')} Copy value</button><button class="linkbtn" id="pInsight">${icon('bulb')} Add insight</button></div>
   <div class="label">7AI summary</div><p style="margin:4px 0 16px">${esc(n.summary)}</p>
   <div class="label">Relationship</div><p style="margin:4px 0 16px">${esc(n.rel)}</p>
   <div class="label">Value</div><pre class="code">${esc(JSON.stringify(n.json,null,2))}</pre>`;
-  $('#panelClose').addEventListener('click',()=>{ p.hidden=true; state.sel=null; $$('.node').forEach(x=>x.setAttribute('aria-pressed','false')); });
+  $('#panelClose').addEventListener('click',()=>{ p.hidden=true; state.sel=null; $$('#edges path.e').forEach(pa=>pa.classList.remove('rel')); $$('.node').forEach(x=>x.setAttribute('aria-pressed','false')); });
   $('#pCopy').addEventListener('click',()=>copyText(n.json.value||n.json.hostname||n.json.account||n.json.name,'Value copied'));
   $('#pInsight').addEventListener('click',()=>textDialog('Add alert insight',`What should analysts know about ${esc(n.value)}?`,'Save insight',v=>{ logEvent(`Insight added on ${n.type.toLowerCase()} ${n.value}`+(v?`: “${v.slice(0,80)}”`:'')); toast('Insight saved to history'); }));
 }
 document.addEventListener('click', e => { const n=e.target.closest('.node'); if(n){ selectEntity(n.dataset.id); return; } const r=e.target.closest('tr[data-ent]'); if(r){ setMapView('graph'); selectEntity(r.dataset.ent); } });
 document.addEventListener('keydown', e => { if((e.key==='Enter'||e.key===' ') && e.target.matches?.('tr[data-ent]')){ e.preventDefault(); e.target.click(); } });
-function setMapView(v){ state.mapView=v; $('#graphView').hidden=v!=='graph'; $('#tableView').hidden=v!=='table'; $('#vGraph').setAttribute('aria-pressed',v==='graph'); $('#vTable').setAttribute('aria-pressed',v==='table'); $('#btnMapSize').hidden=v!=='graph'; if(v==='graph') fitMap(); }
+function setMapView(v){ state.mapView=v; $('#graphView').hidden=v!=='graph'; $('#tableView').hidden=v!=='table'; $('#vGraph').setAttribute('aria-pressed',v==='graph'); $('#vTable').setAttribute('aria-pressed',v==='table'); $('#btnMapSize').hidden=v!=='graph'; if(v==='graph'){ fitMap(); if(mapShown && !RM()){ resetMap(); requestAnimationFrame(revealMap); } } }
 $('#vGraph').addEventListener('click',()=>setMapView('graph')); $('#vTable').addEventListener('click',()=>setMapView('table'));
 $('#btnMapSize').addEventListener('click', () => { const big=map.classList.toggle('big'); $('#btnMapSize span').textContent=big?'Shrink map':'Enlarge map'; fitMap(); });
 
@@ -1206,11 +1435,12 @@ function runAction(a){
 }
 function closeReasoning(){ const r=$('#reasoning'); r.hidden=true; $$('[data-reason]').forEach(b=>b.setAttribute('aria-expanded','false')); $$('.cell').forEach(c=>c.classList.remove('active')); }
 function openReasoning(key){
+  if(state.live) return;
   const btn=$(`[data-reason="${key}"]`), r=$('#reasoning'), d=REASONS[key];
   if(btn.getAttribute('aria-expanded')==='true'){ closeReasoning(); return; }
   closeReasoning(); btn.setAttribute('aria-expanded','true'); $(`[data-sig="${key}"]`).classList.add('active');
   r.innerHTML=`<div style="min-width:0"><div class="cardtitle" style="margin-bottom:8px">${esc(d.title)}</div>${d.paras.map(p=>`<p>${esc(p)}</p>`).join('')}${d.items?`<ul class="evl">${d.items.map(i=>`<li><button type="button" class="evrow" data-run="${i[1]}">${icon(i[2])}<span class="t">${esc(i[0])}</span><span class="go">${esc(i[3]||'View evidence')} ›</span></button></li>`).join('')}</ul>`:''}${d.links?`<div class="acts">${d.links.map(l=>`<button class="linkbtn" data-run="${l[1]}">${esc(l[0])} ›</button>`).join('')}</div>`:''}</div><button class="btn icon" id="reasonClose" aria-label="Close reasoning">${icon('x')}</button>`;
-  r.hidden=false; $('#reasonClose').addEventListener('click',()=>{ closeReasoning(); btn.focus(); });
+  r.hidden=false; play(r,'m-drop'); $('#reasonClose').addEventListener('click',()=>{ closeReasoning(); btn.focus(); });
 }
 document.addEventListener('click', e => { const b=e.target.closest('[data-reason]'); if(b) openReasoning(b.dataset.reason); else { const cell=e.target.closest('.cell[data-sig]'); if(cell && !window.getSelection().toString()) openReasoning(cell.dataset.sig); } const run=e.target.closest('[data-run]'); if(run) runAction(run.dataset.run); });
 document.addEventListener('keydown', e => { if(e.key==='Escape' && !$('#reasoning').hidden && !dlg.open && !drawer.open){ const open=$('[data-reason][aria-expanded="true"]'); closeReasoning(); if(open) open.focus(); } });
@@ -1367,7 +1597,7 @@ function setView(v, o = {}){
   $$('#protoDock button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view===v)));
   closeReasoning();
   if(v==='t2') $('#btnExpandAll').click(); else { $('#btnCollapseAll').click(); setExpanded($('#t-domain .trow'),true); setExpanded($('#stephead-edr'),true); }
-  state.auditAll = false; applyPerson(); layout(); renderTimeline(); updateStatus(); forced = null; window.scrollTo({top:0, behavior:'instant'}); spy(); updDecide(); if(o.push!==false) navPush();
+  if(!document.body.classList.contains('boot')) play($('.page'),'vswap'); state.auditAll = false; applyPerson(); layout(); renderTimeline(); updateStatus(); forced = null; window.scrollTo({top:0, behavior:'instant'}); spy(); updDecide(); if(o.push!==false) navPush();
 }
 window.setPersonaView = setView;
 window.addEventListener('message', e => { if(e.data && e.data.type==='persona-view' && VIEWS[e.data.view]) setView(e.data.view); });
@@ -1381,7 +1611,7 @@ function reasonDialog(o){ openDialog({ title:o.title, ok:o.ok, body:`<label clas
 $('#t2Challenge').addEventListener('click', () => reasonDialog({ title:'Challenge and re-scan', label:'Which check should be re-run, and why? (required)', ok:'Request re-scan', required:true, err:'Say what to re-run before you request a re-scan.', onSave:v => { state.t2='challenged'; logEvent(`Re-scan requested: “${v.slice(0,100)}”`, true, 'decision'); updateStatus(); toast('Re-scan requested'); } }));
 $('#t2Confirm').addEventListener('click', () => reasonDialog({ title:'Confirm 7AI’s action', label:'Add a note for Tier 1 Analyst (optional)', ok:'Confirm', required:false, onSave:v => { state.t2='confirmed'; logEvent(`7AI’s action confirmed${v?`. Note to Tier 1: “${v.slice(0,100)}”`:''}`, true, 'decision'); updateStatus(); toast('Confirmed. Your note went to Tier 1'); } }));
 $('#t2Escalate').addEventListener('click', () => reasonDialog({ title:'Escalate to the leader', label:'Why does this need the leader? (required)', ok:'Escalate', required:true, err:'Add a reason before you escalate.', onSave:v => { state.t2='escalated'; logEvent(`Escalated to the leader: “${v.slice(0,100)}”`, true, 'decision'); updateStatus(); toast('Escalated to the leader'); } }));
-document.addEventListener('click', e => { const r = e.target.closest('[data-rescan]'); if(r){ logEvent(`Re-scan requested: ${r.dataset.rescan}`, false, 'note'); toast('Re-scan requested for '+r.dataset.rescan); } });
+document.addEventListener('click', e => { const r = e.target.closest('[data-rescan]'); if(r){ logEvent(`Re-scan requested: ${r.dataset.rescan}`, false, 'note'); toast('Re-scan requested for '+r.dataset.rescan); const tl=r.closest('.tool'); if(tl && !RM()){ tl.classList.add('working'); setTimeout(()=>{ tl.classList.remove('working'); flash(tl); },2000); } } });
 $('#btnReviewDecision').addEventListener('click', () => {
   const last = [...state.history].reverse().find(h => h.kind==='decision');
   openDialog({ title:'Review decision', ok:'Save review',
@@ -1461,6 +1691,25 @@ buildLayout();
 openTool('t-domain');
 history.scrollRestoration = 'manual'; try{ history.replaceState({view:'t1', screen:'case'}, ''); }catch(_){}
 setView('t1', {push:false});
+
+/* ---------- motion init ---------- */
+(function(){
+  setTimeout(()=>document.body.classList.remove('boot'), 2200);
+  const hasIO = 'IntersectionObserver' in window;
+  // entity graph draws outward from the alert the first time it is seen
+  if(RM() || !hasIO) revealMap();
+  else { const io=new IntersectionObserver((es,o)=>{ if(es.some(e=>e.isIntersecting)){ revealMap(); o.disconnect(); } },{threshold:.35}); io.observe(map); }
+  // lower sections ease in on scroll
+  if(!RM() && hasIO){
+    const els=['remediation','artifacts','audit'].map(i=>document.getElementById(i)).filter(Boolean);
+    els.forEach(e=>e.classList.add('m-rv'));
+    const io2=new IntersectionObserver(es=>es.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); io2.unobserve(en.target); } }),{threshold:.06,rootMargin:'0px 0px -6% 0px'});
+    els.forEach(e=>io2.observe(e));
+  }
+  VT_HTML = $('.vtime').innerHTML;
+  countUpTime(450);
+  document.addEventListener('keydown', e => { if(e.key==='Escape' && state.replaying && !dlg.open && !drawer.open) runReplay(false); });
+})();
 })();
 </script>
 <script>
